@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fuori città: Vodno e Matka · Guida di Skopje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>/* Guida di Londra — stile delle pagine.
+   Stampa: pagine A5 fisse (148 x 210 mm). Schermo: le stesse pagine una sotto l'altra, fluide sotto i 640 px.
+   Ogni capitolo è una "linea della metro" del suo colore (--cap) che corre sul bordo esterno,
+   con una fermata per sezione: la fermata accesa dice dove sei nel capitolo. */
+
+:root{
+  --ink:#1d2a44;        /* blu notte: testo e titoli */
+  --muted:#5f6472;
+  --paper:#fffdf9;      /* carta quasi bianca, per foto nitide */
+  --sand:#f2ebde;       /* fondi dei riquadri */
+  --red:#b8402f; --teal:#2f7272; --mustard:#c08a25; --navy:#26375c;
+  --teal-tint:#e6f0ee; --mustard-tint:#f7eedb;
+  --cap:var(--red);     /* colore del capitolo, ridefinito su ogni capitolo */
+  --f-display:"Fraunces", Georgia, serif;
+  --f-body:"Figtree", "Helvetica Neue", Arial, sans-serif;
+}
+@page{ size:148mm 210mm; margin:0 }
+*{ box-sizing:border-box }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ margin:0; background:#e7e2d8; color:var(--ink); font:400 8.9pt/1.45 var(--f-body); font-variant-numeric:tabular-nums }
+img{ display:block; max-width:100% }
+a{ color:inherit }
+
+/* ---------- pagina ---------- */
+.page{ width:148mm; height:210mm; margin:0 auto 6mm; background:var(--paper); position:relative; overflow:hidden;
+  padding:14mm 17mm 15mm 13mm; break-after:page; display:flex; flex-direction:column; gap:3.2mm }
+.page.sx{ padding:14mm 13mm 15mm 17mm }               /* pagina pari: margine esterno a sinistra */
+@media print{ body{ background:none } .page{ margin:0 } }
+
+.testata{ position:absolute; top:6.5mm; left:13mm; right:17mm; display:flex; justify-content:space-between;
+  font:500 6.8pt var(--f-body); color:var(--muted) }
+.sx .testata{ left:17mm; right:13mm; flex-direction:row-reverse }
+.folio{ position:absolute; bottom:6.5mm; right:17mm; font:600 7.5pt var(--f-body); color:var(--ink) }
+.sx .folio{ right:auto; left:17mm }
+
+/* linea della metro sul bordo esterno */
+.linea{ position:absolute; top:0; bottom:0; right:5.2mm; width:2.2mm; background:var(--cap) }
+.sx .linea{ right:auto; left:5.2mm }
+.linea i{ position:absolute; left:50%; width:4.2mm; height:4.2mm; margin-left:-2.1mm; border-radius:50%;
+  background:#fff; border:.9mm solid var(--cap) }
+.linea i.qui{ width:5.6mm; height:5.6mm; margin-left:-2.8mm; background:var(--ink); border-color:#fff; box-shadow:0 0 0 .6mm var(--cap) }
+
+/* ---------- tipografia ---------- */
+h1,h2,h3,h4{ font-family:var(--f-display); margin:0; color:var(--ink); text-wrap:balance; font-optical-sizing:auto }
+h2{ font-size:21pt; line-height:1.02; font-weight:800; letter-spacing:-.01em }
+h3{ font-size:12.5pt; line-height:1.15; font-weight:700 }
+h4{ font-size:10pt; font-weight:700 }
+p{ margin:0 }
+.testo p + p{ margin-top:2.2mm }
+.testo{ hyphens:auto; -webkit-hyphens:auto }
+.lead{ font:400 11pt/1.38 var(--f-display); color:var(--ink) }
+.sezione{ font:600 8pt var(--f-body); color:var(--cap) }       /* nome della sezione sopra il titolo */
+.piccolo{ font-size:7.6pt; color:var(--muted) }
+.cap{ font-size:6.8pt; color:var(--muted); margin-top:1.2mm; font-style:italic }
+
+/* ---------- foto ---------- */
+.foto{ position:relative; overflow:hidden; border-radius:1.2mm; flex:none }
+.foto img{ width:100%; height:100%; object-fit:cover }
+.foto.al{ margin:0 -17mm 0 -13mm; border-radius:0 }            /* al vivo orizzontale */
+.sx .foto.al{ margin:0 -13mm 0 -17mm }
+
+/* ---------- apertura capitolo ---------- */
+.apertura{ padding:0 }
+.apertura > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
+.apertura .velo{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(20,28,46,.0) 35%, rgba(20,28,46,.86) 82%) }
+.apertura .titolo{ position:absolute; left:13mm; right:17mm; bottom:16mm; color:#fff }
+.apertura .num{ font:600 8pt var(--f-body); color:#fff; opacity:.85 }
+.apertura h1{ font-size:38pt; line-height:.95; font-weight:900; color:#fff; margin:2mm 0 4mm }
+.apertura .sotto{ font:400 10.5pt/1.35 var(--f-display); max-width:100mm; opacity:.95 }
+
+/* ---------- riquadri ---------- */
+.info{ background:var(--teal-tint); border-radius:1.5mm; padding:3mm 3.5mm; display:grid;
+  grid-template-columns:15mm 1fr; gap:1.1mm 3mm; font-size:7.9pt; line-height:1.35; flex:none }
+.info dt{ font-weight:700; color:var(--teal) }
+.info dd{ margin:0 }
+.consiglio{ background:var(--mustard-tint); border-radius:1.5mm; padding:3mm 3.5mm; font-size:8.4pt; flex:none }
+.consiglio h4{ color:#8a5f12; margin-bottom:1mm; display:flex; align-items:center; gap:2mm }
+.consiglio h4::before{ content:""; width:3.4mm; height:3.4mm; border-radius:50%; border:.8mm solid var(--mustard); flex:none }
+.riquadro{ background:var(--sand); border-radius:1.5mm; padding:3.2mm 3.6mm; font-size:8.4pt; flex:none }
+.riquadro h4{ margin-bottom:1.2mm }
+.top-lista{ margin:0; padding:0; list-style:none; display:grid; gap:1.4mm }
+.top-lista li{ display:grid; grid-template-columns:5mm 1fr; gap:2mm; align-items:baseline }
+.top-lista b{ font-family:var(--f-display); font-weight:800; color:var(--cap); font-size:10pt }
+
+/* ---------- schede (da vedere, mangiare...) ---------- */
+.voce{ display:grid; grid-template-columns:6.4mm 1fr; gap:0 2.6mm; break-inside:avoid }
+.voce + .voce{ padding-top:2.6mm; border-top:.25mm solid #e2dacb }
+.n{ width:6.4mm; height:6.4mm; border-radius:50%; background:var(--cap); color:#fff; font:700 7.6pt/6.4mm var(--f-body);
+  text-align:center; grid-row:span 3 }
+.n.m{ background:var(--teal) } .n.b{ background:var(--mustard) } .n.s{ background:var(--navy) }
+.voce h3{ font-size:11pt }
+.voce .dati{ font-size:7.4pt; color:var(--muted); margin:.4mm 0 1mm }
+.voce .dati b{ color:var(--ink); font-weight:600 }
+.voce .con-foto{ display:grid; grid-template-columns:1fr 30mm; gap:3mm; align-items:start }
+.voce .con-foto .foto{ height:22mm }
+.prezzo{ font-family:var(--f-body); font-weight:700; color:var(--teal); font-size:8pt; margin-left:1.5mm }
+
+/* ---------- mappa del capitolo ---------- */
+.mappa-pag{ padding:0 }
+.mappa-pag > img{ position:absolute; inset:0; width:100%; height:100% ; object-fit:cover }
+.mappa-pag .scala{ position:absolute; left:6mm; bottom:5mm; background:rgba(255,253,249,.94); border-radius:1.2mm; padding:1.6mm 2.4mm; font-size:6.6pt; color:var(--muted) }
+.legenda{ columns:2; column-gap:5mm; font-size:7.7pt; line-height:1.3 }
+.legenda h4{ font:700 8pt var(--f-body); color:var(--ink); margin:2.4mm 0 1mm; break-after:avoid; display:flex; align-items:center; gap:1.8mm }
+.legenda h4:first-child{ margin-top:0 }
+.legenda h4 i{ width:3mm; height:3mm; border-radius:50% }
+.legenda ol{ margin:0; padding:0; list-style:none }
+.legenda li{ display:grid; grid-template-columns:5mm 1fr auto; gap:1mm; padding:.45mm 0; break-inside:avoid }
+.legenda li b{ font-weight:700 }
+.legenda li span{ color:var(--muted) }
+
+/* ---------- passeggiata ---------- */
+.tappe{ margin:0; padding:0; list-style:none; position:relative }
+.tappe::before{ content:""; position:absolute; left:2.9mm; top:2mm; bottom:3mm; width:.9mm; background:var(--cap) }
+.tappe li{ position:relative; padding:0 0 2.6mm 9mm; font-size:8.4pt }
+.tappe li::before{ content:attr(data-n); position:absolute; left:0; top:-.3mm; width:6.6mm; height:6.6mm; border-radius:50%;
+  background:#fff; border:.8mm solid var(--cap); font:700 7pt/5mm var(--f-body); text-align:center; color:var(--ink) }
+.tappe b{ font-family:var(--f-display); font-size:9.8pt }
+.tappe .tempo{ color:var(--muted); font-size:7.4pt }
+
+.due{ display:grid; grid-template-columns:1fr 1fr; gap:4mm }
+.spinta{ margin-top:auto }   /* spinge un riquadro in fondo alla pagina */
+
+/* ---------- schermo stretto (sito sul telefono) ---------- */
+@media screen and (max-width: 640px){
+  body{ background:var(--paper); font-size:15px }
+  .page, .page.sx{ width:auto; height:auto; min-height:0; margin:0; padding:22px max(18px, env(safe-area-inset-right, 0px)) 26px max(18px, env(safe-area-inset-left, 0px));
+    border-bottom:1px solid #e2dacb; overflow:visible }
+  .linea, .folio, .testata{ display:none }
+  .foto.al, .sx .foto.al{ margin:0 -18px }
+  .apertura{ min-height:88vh }
+  .apertura .titolo{ left:20px; right:20px; bottom:28px }
+  .mappa-pag{ height:auto }
+  .mappa-pag > img{ position:static; height:auto }
+  .due, .voce .con-foto{ grid-template-columns:1fr }
+  .voce .con-foto .foto{ height:44vw }
+  .legenda{ columns:1 }
+  .foto[style*="height"]{ height:auto !important; aspect-ratio:3/2 }
+  /* sul telefono i caratteri in punti tipografici diventerebbero minuscoli */
+  .riquadro, .consiglio, .tappe li, .card p{ font-size:14.5px }
+  .info, .legenda, .voce .dati, .piccolo, .cap, .lista-crediti{ font-size:13px }
+  .info{ grid-template-columns:76px 1fr }
+  .lead{ font-size:18px } h2{ font-size:30px } .voce h3{ font-size:19px } h3{ font-size:19px } h4{ font-size:16px }
+  .n{ width:28px; height:28px; font-size:13px; line-height:28px }
+  .voce{ grid-template-columns:28px 1fr; gap:0 12px }
+  .riquadro [style*="font-size"]{ font-size:14px !important }
+  .riquadro [style*="grid-template-columns:13mm"]{ grid-template-columns:72px 1fr !important }
+  .riquadro [style*="grid-template-columns:24mm"]{ grid-template-columns:96px 1fr !important }
+}
+
+/* ---------- sommario e indice analitico (generati da costruisci.py) ---------- */
+.sommario{ list-style:none; margin:0; padding:0; display:grid; gap:1.6mm; font-size:9.6pt }
+.sommario li{ display:grid; grid-template-columns:3mm 1fr auto; gap:3mm; align-items:baseline; border-bottom:.25mm dotted #cfc5b2; padding-bottom:1.2mm }
+.sommario li i{ width:3mm; height:3mm; border-radius:50%; align-self:center }
+.sommario li b{ font-family:var(--f-display); font-weight:800 }
+.sommario li.parte{ display:block; border:0; margin-top:2.4mm; font:700 7.5pt var(--f-body); color:var(--muted) }
+.indice{ list-style:none; margin:0; padding:0; columns:2; column-gap:6mm; font-size:7.2pt; line-height:1.3 }
+.indice li{ display:flex; justify-content:space-between; gap:2mm; break-inside:avoid; padding:.35mm 0; border-bottom:.2mm dotted #ddd3c0 }
+.indice b{ font-weight:600; white-space:nowrap }
+@media screen and (max-width: 640px){ .sommario{ font-size:16px } .indice{ columns:1; font-size:14px } }
+
+.page{--cap:#3d6b45}
+.lista-crediti{margin:0;padding:0;list-style:none;display:grid;gap:1.4mm;font-size:7pt;line-height:1.3}
+.lista-crediti span{color:var(--muted);word-break:break-all}
+.appunti .righe{flex:1;background:repeating-linear-gradient(transparent 0 7.4mm, #e2dacb 7.4mm 7.65mm)}
+
+.barra-web{display:none}
+@media screen{.barra-web{display:flex;gap:18px;justify-content:center;position:sticky;top:0;z-index:10;
+  padding:10px 16px;background:#1d2a44;font:600 14px var(--f-body)}.barra-web a{color:#fff;text-decoration:none}}
+@media print{.barra-web{display:none}}
+</style></head><body><nav class="barra-web"><a href="./">← Guida</a><a href="03-fuori.pdf">Scarica il PDF</a><a href="../">Mappa</a></nav>
+<section id="p61" class="page apertura" data-sez="1" data-nohead><div class="linea" aria-hidden="true"><i class="qui" style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div>
+  <img style="object-position:50% 50%" src="img/foto/f_matka.jpg" alt="Il canyon di Matka con il lago verde fra le pareti di roccia">
+  <div class="velo"></div>
+  <div class="titolo">
+    <div class="num">Zone</div>
+    <h1>Fuori città:<br>Vodno e Matka</h1>
+    <p class="sotto">Una montagna con una croce di sessantasei metri e un canyon con dieci grotte, a mezz'ora dalla piazza.</p>
+  </div>
+</section>
+<section id="p62" class="page sx" data-sez="1"><div class="linea" aria-hidden="true"><i class="qui" style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">62</div>
+  <p class="sezione">Perché andarci</p>
+  <h2>Le due uscite che valgono</h2>
+  <div class="testo">
+    <p class="lead">Skopje si esaurisce in un giorno e mezzo. Quello che la rende un viaggio vero sta fuori: il <strong>monte Vodno</strong> a sud, che chiude l'orizzonte della città, e il <strong>canyon di Matka</strong> a ovest, quindici chilometri di roccia e acqua verde.</p>
+    <p>Sono due gite molto diverse. Il Vodno è un'ora e mezza in tutto, si fa in coda a una giornata e si va per il tramonto. Matka è mezza giornata piena e va fatta la mattina, perché il canyon è stretto e il sole ci entra poco anche d'estate.</p>
+    <p>A dicembre c'è un terzo elemento che decide: quando la città sta sotto una cappa di smog, il Vodno sta <strong>sopra l'inversione termica</strong>. Nelle giornate peggiori dell'inverno è il posto dove si respira.</p>
+  </div>
+  <dl class="info">
+    <dt>Vodno</dt><dd>Bus 25 + funivia. <b>Un'ora e mezza</b> andata e ritorno compresa. Funivia <b>chiusa il lunedì</b>.</dd>
+    <dt>Matka</dt><dd>Van privato o bus 60. <b>Mezza giornata</b>, cinque ore porta a porta con la barca.</dd>
+    <dt>Quando</dt><dd>Matka la mattina, il Vodno nel pomeriggio: il tramonto è alle <b>16:05</b>.</dd>
+    <dt>In sei</dt><dd>Per Matka il van privato conviene: <b>50-60 €</b> andata e ritorno per tutti, contro un'ora di bus più venti minuti di cammino.</dd>
+  </dl>
+  <div class="consiglio spinta">
+    <h4>Il trucco</h4>
+    <p>Non provate a farle nello stesso giorno. Con nove ore di luce, Matka la mattina e il Vodno al tramonto significa correre tutto il giorno e vedere male entrambe. Una per giornata.</p>
+  </div>
+</section>
+<section id="p63" class="page mappa-pag" data-sez="2" data-nohead><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i class="qui" style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div>
+  <img src="img/mappa-03-fuori.jpg" alt="Mappa dei dintorni di Skopje con il Vodno e il canyon di Matka">
+  <div class="scala">1 Piazza Macedonia · 2 Sredno Vodno, funivia · 3 Croce del Millennio · 4 Matka · 5 Grotta di Vrelo · 6 Skupi</div>
+</section>
+<section id="p64" class="page sx" data-sez="3"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i class="qui" style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">64</div>
+  <p class="sezione">Monte Vodno</p>
+  <h2>Come si sale</h2>
+  <div class="foto" style="height:48mm"><img src="img/foto/f_vodnoneve.jpg" alt="La Croce del Millennio sulla cima innevata del monte Vodno"></div>
+  <p class="cap">D'inverno la cima può essere sotto la neve anche quando in città non ce n'è.</p>
+  <div class="testo">
+    <p>La montagna arriva a <strong>1.066 metri</strong> sulla cima di Krstovar. Si sale in due passi: prima a <strong>Sredno Vodno</strong>, il Vodno di mezzo, a 557 metri, poi con la funivia fino in cima.</p>
+  </div>
+  <dl class="info spinta">
+    <dt>Fino a Sredno Vodno</dt><dd><b>Bus 25</b> dalla stazione centrale, 20-30 minuti, ~40 MKD. In alternativa due taxi (~300 MKD l'uno).</dd>
+    <dt>Funivia</dt><dd><b>Novembre-marzo 10:00-17:00</b>, ultima salita alle <b>16:45</b>. <b>Chiusa il lunedì</b> per manutenzione.</dd>
+    <dt>Biglietto</dt><dd><b>100 MKD</b> adulti (~1,60 €). Per noi sei: 600 MKD, meno di dieci euro.</dd>
+    <dt>Durata</dt><dd>Sette minuti di salita. In cima si sta quanto si vuole.</dd>
+  </dl>
+</section>
+<section id="p65" class="page" data-sez="4"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i class="qui" style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">65</div>
+  <p class="sezione">Monte Vodno</p>
+  <h2>La Croce del Millennio</h2>
+  <div class="testo">
+    <p class="lead">Sessantasei metri d'acciaio sulla cima, costruiti nel <strong>2002</strong> per i duemila anni del cristianesimo in Macedonia. È una delle croci più alte del mondo e si vede da quasi tutta la città.</p>
+    <p>La struttura è a traliccio, dichiaratamente ispirata alla Torre Eiffel, e poggia su una piattaforma di <strong>dodici colonne</strong>: sono i dodici apostoli. Dentro c'è un <strong>ascensore</strong> che porta a una piattaforma panoramica in alto.</p>
+    <p>Di notte la croce è coperta di migliaia di luci ed è il punto di riferimento visivo di Skopje: se vi perdete in città, è sempre a sud.</p>
+  </div>
+  <div class="riquadro">
+    <h4>Cosa si vede</h4>
+    <p>Tutta la valle del Vardar: la città sotto, le montagne attorno e, nelle giornate limpide, molto lontano. È il miglior punto panoramico della capitale, e a dicembre il tramonto arriva comodo, poco dopo le quattro.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>A dicembre, attenzione</h4>
+    <p>In cima fa molto più freddo che in città e tira vento: sul Vodno la minima registrata nel gennaio 2017 è stata di <strong>−24 °C</strong>. Portate un capo pesante anche se in piazza bastava la giacca. E non perdete l'<strong>ultima corsa delle 16:45</strong>: a piedi si scende in un'ora e mezza, al buio.</p>
+  </div>
+</section>
+<section id="p66" class="page sx" data-sez="5"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i class="qui" style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">66</div>
+  <p class="sezione">Canyon di Matka</p>
+  <h2>Come ci si arriva</h2>
+  <div class="testo">
+    <p class="lead">Quindici chilometri a ovest del centro, sul fiume <strong>Treska</strong>. Il canyon copre circa <strong>cinquemila ettari</strong> ed è la gita classica da Skopje.</p>
+  </div>
+  <div class="voce">
+    <div class="n">1</div>
+    <h3>Van privato <span class="prezzo">consigliato</span></h3>
+    <div class="dati"><b>30-40 minuti</b> porta a porta · <b>50-60 €</b> andata e ritorno per sei</div>
+    <p>Arriva fino al parcheggio dell'imbarcadero. Si concorda l'ora del ritorno e l'autista aspetta o torna a prendervi. Diviso per sei fa meno di dieci euro a testa, e risparmia un'ora e mezza di spostamenti.</p>
+  </div>
+  <div class="voce">
+    <div class="n">2</div>
+    <h3>Bus 60 <span class="prezzo">60 MKD</span></h3>
+    <div class="dati"><b>40-60 minuti</b> dalla stazione centrale, più <b>20 minuti a piedi</b> dalla fermata</div>
+    <p>La soluzione economica: un euro a testa. Ma la fermata non è al canyon e il tratto finale si fa a piedi lungo la strada. <strong>L'ultima corsa di ritorno parte alle 19:30</strong>, un dato che a dicembre non vi servirà: sarete già rientrati da un pezzo.</p>
+  </div>
+  <div class="riquadro spinta">
+    <h4>Il lago</h4>
+    <p>L'acqua che vedete non è naturale: il <strong>lago di Matka è il più antico lago artificiale del Paese</strong>, creato da una diga sul Treska. È per questo che il livello è sempre uguale e l'acqua è ferma e verde.</p>
+  </div>
+</section>
+<section id="p67" class="page" data-sez="6"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i class="qui" style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">67</div>
+  <p class="sezione">Canyon di Matka</p>
+  <h2>Il sentiero e i monasteri</h2>
+  <div class="foto" style="height:46mm"><img src="img/foto/f_monastero.jpg" alt="Il piccolo monastero medievale di Sant'Andrea sotto le pareti del canyon"></div>
+  <p class="cap">Il monastero di Sant'Andrea, sulla riva del lago, sotto la parete di roccia.</p>
+  <div class="testo">
+    <p>Dall'imbarcadero parte una <strong>passerella scavata nella roccia</strong> che corre a filo d'acqua sotto le pareti. In venti minuti si arriva al <strong>monastero di Sant'Andrea</strong>, una chiesetta medievale minuscola incastrata fra la roccia e il lago: nel canyon ce ne sono diversi, lasciati dai monaci che qui si ritiravano.</p>
+    <p>D'inverno il sentiero è vuoto, l'acqua è verde scuro e il rumore è solo quello del vento nella gola. È il momento migliore dell'anno per venirci, a patto di avere scarpe che tengono: il camminamento è di pietra e in alcuni punti bagnato.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Il trucco</h4>
+    <p>Anche senza barca, la passerella da sola vale il viaggio. Se le barche non partono — a dicembre dipende dal meteo e dal numero di passeggeri — ci sono comunque due ore buone di cammino sul lago.</p>
+  </div>
+</section>
+<section id="p68" class="page sx" data-sez="7"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i class="qui" style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">68</div>
+  <p class="sezione">Canyon di Matka</p>
+  <h2>La grotta di Vrelo</h2>
+  <div class="foto" style="height:46mm"><img src="img/foto/f_vrelo.jpg" alt="L'interno della grotta di Vrelo con la luce che entra sull'acqua"></div>
+  <div class="testo">
+    <p class="lead">Nel canyon ci sono <strong>dieci grotte</strong>, la più corta di venti metri e la più lunga di 176, più due pozzi verticali profondi una trentina di metri. La più famosa è <strong>Vrelo</strong>, sulla riva destra del Treska.</p>
+    <p>Dentro ci sono stalattiti — una grossa al centro della sala è chiamata "la pigna" per la forma — e <strong>due laghi sotterranei</strong>. Il più piccolo è profondo quasi quindici metri, il più grande arriva a diciotto. <strong>La profondità totale della grotta non è nota</strong>: si ritiene che sia fra le più profonde d'Europa, forse del mondo.</p>
+    <p>Nel progetto New7Wonders of Nature è entrata fra i <strong>77 siti naturali finalisti</strong> del mondo.</p>
+  </div>
+  <dl class="info spinta">
+    <dt>Come si arriva</dt><dd>Solo in <b>barca</b> dall'imbarcadero, circa 15 minuti di navigazione.</dd>
+    <dt>Prezzo</dt><dd>Intorno a <b>400 MKD</b> a persona (~6,50 €). Per noi sei: circa 40 €.</dd>
+    <dt>Durata</dt><dd>Circa due ore fra navigazione, visita e ritorno.</dd>
+    <dt>A dicembre</dt><dd>Le partenze <b>non sono garantite</b>: dipendono dal meteo e dal numero di passeggeri. <b>Fatevi confermare il giorno prima.</b></dd>
+  </dl>
+</section>
+<section id="p69" class="page" data-sez="8"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i class="qui" style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">69</div>
+  <p class="sezione">Più lontano</p>
+  <h2>Quello che in tre giorni non ci sta</h2>
+  <div class="testo">
+    <p class="lead">Vale la pena saperlo prima, per non perdere tempo a discuterne sul posto: con due notti e tre mezze giornate, fuori da Skopje ci stanno il Vodno e Matka. Il resto no.</p>
+  </div>
+  <div class="voce">
+    <h3 style="grid-column:1/-1">Ocrida <span class="prezzo">da escludere</span></h3>
+    <p style="grid-column:1/-1">Il lago più bello dei Balcani, patrimonio UNESCO, e la ragione per cui molti tornano in Macedonia. Sono circa <strong>tre ore di strada</strong> a tratta. In giornata significa sei ore di pullman per quattro ore sul posto, in un giorno che fa buio alle quattro. Merita un viaggio suo.</p>
+  </div>
+  <div class="voce">
+    <h3 style="grid-column:1/-1">Tetovo e la Moschea Dipinta</h3>
+    <p style="grid-column:1/-1">Circa <strong>quaranta minuti</strong> a ovest: una moschea del Settecento dipinta a fiori dentro e fuori, unica nei Balcani. È l'unica gita che tecnicamente ci starebbe, ma costa mezza giornata e toglie Matka. <strong>Da verificare orari e accesso</strong> prima di considerarla.</p>
+  </div>
+  <div class="voce">
+    <div class="n">6</div>
+    <h3>Skupi, la città romana</h3>
+    <div class="dati"><b>15 minuti</b> a nord-ovest del centro · sito archeologico all'aperto</div>
+    <p>Le rovine della città romana distrutta dal terremoto del <strong>518</strong>: teatro, basilica, terme. Le pietre di Skupi finirono nelle mura del Kale. È vicina e poco visitata, ma d'inverno è un campo aperto e spoglio: andateci solo se avanza tempo e c'è sole.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Il consiglio</h4>
+    <p>Tre giorni a Skopje sono giusti per Skopje. Se il gruppo vuole il lago di Ocrida, è un altro viaggio: due notti là, in primavera, quando la luce dura.</p>
+  </div>
+</section>
+<section id="p70" class="page sx" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">70</div>
+  <p class="sezione">Pratica</p>
+  <h2>Mangiare fuori e cosa portarsi</h2>
+  <div class="voce">
+    <div class="n m">1</div>
+    <h3>Il ristorante dell'imbarcadero, a Matka <span class="prezzo">€€</span></h3>
+    <div class="dati">Sul lago, accanto al punto di partenza delle barche</div>
+    <p>Terrazza sull'acqua, trota del fiume, šopska, birra Skopsko. D'inverno si mangia dentro. Non è economico come il bazar ma la posizione la paga tutta. <strong>Chiamate prima se siete sei</strong>: fuori stagione può chiudere presto.</p>
+  </div>
+  <div class="voce">
+    <div class="n b">2</div>
+    <h3>In cima al Vodno <span class="prezzo">€</span></h3>
+    <div class="dati">Bar alla stazione a monte della funivia</div>
+    <p>Un caffè o una <i>greana rakija</i> guardando la città che si accende. Poco più di questo: non contateci per mangiare.</p>
+  </div>
+  <div class="riquadro">
+    <h4>Nello zaino, per tutte e due</h4>
+    <p>Scarpe impermeabili con suola che tiene, un capo pesante in più per la cima del Vodno, guanti, acqua, e contanti: a Matka le barche si pagano in denari e non sempre c'è il bancomat. Il telefono carico, perché le mappe offline servono se il bus vi lascia nel punto sbagliato.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Prima di partire da Skopje</h4>
+    <p>Due telefonate la sera prima: una per confermare che <strong>le barche di Matka partano</strong>, una per sapere se <strong>la funivia del Vodno è in servizio</strong>. Entrambe d'inverno saltano senza preavviso, e sono le due uniche cose di questo capitolo che non si possono improvvisare.</p>
+  </div>
+</section>
+<section id="p71" class="page crediti" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">71</div><p class="sezione">Crediti fotografici</p><h2>Le foto di questo capitolo</h2><p class="piccolo">Foto da Wikimedia Commons, pubblicate con licenze Creative Commons o in pubblico dominio. Mappe: Esri, HERE, Garmin e i contributori di OpenStreetMap. Dati stradali: OpenStreetMap.</p><ul class="lista-crediti"><li><b>f_matka</b>: Pudelek, CC BY-SA 4.0, <span>commons.wikimedia.org/wiki/File:Matka_(Матка)_canyon_-_dam.JPG</span></li><li><b>f_vodnoneve</b>: Diego Delso, CC BY-SA 3.0, <span>commons.wikimedia.org/wiki/File:Cruz_Milenaria,_Skopie,_Macedonia,_2014-04-17,_DD_01.JPG</span></li><li><b>f_monastero</b>: mk:Корисник:Македонец, CC BY-SA 3.0, <span>commons.wikimedia.org/wiki/File:St_Andrew_Monastery_Macedonia.jpg</span></li><li><b>f_vrelo</b>: Paweł &#x27;pbm&#x27; Szubert (talk), CC BY-SA 3.0, <span>commons.wikimedia.org/wiki/File:Skopje_-_Vrelo_Cave_02.jpg</span></li></ul></section>
+<section id="p72" class="page sx appunti" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Fuori città: Vodno e Matka</span><span>Zone</span></div><div class="folio">72</div><p class="sezione">Appunti</p><div class="righe"></div></section>
+<script>
+// segnala le pagine troppo piene (in stampa il testo verrebbe tagliato)
+window.addEventListener('load', () => {
+  const piene = [...document.querySelectorAll('.page')].filter(p => p.scrollHeight > p.clientHeight + 2)
+    .map((p, i) => p.querySelector('.folio')?.textContent || 'apertura');
+  document.body.dataset.piene = piene.join(',');
+});
+</script>
+</body></html>

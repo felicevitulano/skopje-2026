@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mappa del nostro viaggio</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: mappa stradale a tutto schermo, elenco per giorno a lato (sotto su telefono), scheda del luogo che si apre sulla mappa */
+:root{
+  --bg:#f1ebdf; --panel:#fbf8f2; --ink:#1d2a44; --muted:#6b6458; --line:#ddd3c0;
+  --d6:#b8402f; --d7:#26375c; --d8:#2f7272; --d9:#c08a25; --dx:#8a8275;
+  --hotel:#e0a93b; --hotel-ink:#1d2a44; --focus:#b8402f;
+  --f-display:"Fraunces", Georgia, serif; --f-body:"Figtree", system-ui, sans-serif;
+}
+*{ box-sizing:border-box }
+html,body{ height:100%; margin:0 }
+[hidden]{ display:none!important }
+body{ background:var(--bg); color:var(--ink); font:15px/1.45 var(--f-body); display:flex; flex-direction:column; overflow:hidden }
+button{ font:inherit; color:inherit }
+:focus-visible{ outline:2px solid var(--focus); outline-offset:2px }
+
+header{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; padding-block:12px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); border-bottom:1px solid var(--line); background:var(--panel); z-index:2 }
+h1{ font:800 22px/1 var(--f-display); margin:0; letter-spacing:-.01em }
+h1 small{ display:block; font:600 11px/1.2 var(--f-body); letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:4px }
+.filters{ display:flex; flex-wrap:wrap; gap:6px; margin-left:auto }
+.chip{ border:1.5px solid var(--line); background:transparent; border-radius:999px; padding:5px 12px; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px }
+.chip i{ width:9px; height:9px; border-radius:50%; display:inline-block }
+.chip[aria-pressed="true"]{ background:var(--ink); color:var(--panel); border-color:var(--ink) }
+.row2{ flex-basis:100%; min-width:0; max-width:100%; display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px }
+.search{ position:relative; flex:0 1 270px; min-width:0 }
+.search input{ width:100%; border:1.5px solid var(--line); border-radius:999px; padding:7px 14px 7px 34px; font:inherit; font-size:14px; background:var(--bg); color:var(--ink) }
+.search input:focus{ outline:none; border-color:var(--ink) }
+.search svg{ position:absolute; left:12px; top:50%; width:15px; height:15px; transform:translateY(-50%); stroke:var(--muted) }
+.filters.themes{ margin-left:0 }
+.chip.t{ font-weight:500; border-style:dashed }
+.chip.t[aria-pressed="true"]{ background:var(--d8); border-color:var(--d8); color:#fff; border-style:solid }
+.count{ font-size:12.5px; color:var(--muted); white-space:nowrap }
+.empty{ padding:18px 16px; color:var(--muted); font-size:14px }
+.item .tm{ display:block; font-size:11.5px; font-weight:400; color:var(--muted); margin-top:1px }
+.chip.hotelbtn{ border-color:var(--hotel) }
+.guidapunti .anello{ width:11px; height:11px; border-radius:50%; border:2.5px solid var(--d6); display:inline-block }
+.guidapunti[aria-pressed="true"]{ background:var(--ink); color:var(--panel); border-color:var(--ink) }
+.guidapunti[aria-pressed="true"] .anello{ border-color:var(--panel) }
+#c-guida{ display:block; margin-bottom:6px }
+.chip.guidabtn{ text-decoration:none; color:var(--ink); border-color:var(--d6) }
+.chip.hotelbtn i{ background:var(--hotel) }
+
+main{ flex:1; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 340px }
+.mapwrap{ position:relative; min-width:0; min-height:0 }
+#map{ position:absolute; inset:0; background:#e8e4dc }
+.leaflet-container{ font-family:var(--f-body) }
+
+/* segnaposto */
+.pin{ width:22px; height:22px; border-radius:50%; border:2.5px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.35); display:grid; place-items:center; color:#fff; font-size:11px; line-height:1; transition:transform .15s }
+.pin.star{ box-shadow:0 0 0 3px rgba(224,169,59,.55), 0 1px 4px rgba(0,0,0,.35) }
+.pin.sel{ transform:scale(1.35); box-shadow:0 0 0 4px var(--focus), 0 1px 6px rgba(0,0,0,.4) }
+.pin.dim{ opacity:.2 }
+.hotelmk{ position:relative; width:44px; height:56px }
+.hotelmk .drop{ position:absolute; left:4px; top:0; width:36px; height:36px; background:var(--hotel); border:3px solid var(--hotel-ink); border-radius:50% 50% 50% 0; transform:rotate(-45deg); box-shadow:0 3px 8px rgba(0,0,0,.35) }
+.hotelmk .h{ position:absolute; left:4px; top:0; width:36px; height:36px; display:grid; place-items:center; font:800 17px var(--f-display); color:var(--hotel-ink) }
+.hotelmk .lbl{ position:absolute; left:46px; top:6px; white-space:nowrap; background:var(--hotel-ink); color:var(--hotel); font:700 11px var(--f-body); letter-spacing:.06em; padding:4px 10px; border-radius:999px; box-shadow:0 2px 6px rgba(0,0,0,.3) }
+.hotelmk .ring{ position:absolute; left:2px; top:-2px; width:40px; height:40px; border-radius:50%; background:var(--hotel); opacity:.4; animation:pulse 2.4s ease-out infinite }
+@keyframes pulse{ from{ transform:scale(.7); opacity:.5 } to{ transform:scale(2.2); opacity:0 } }
+@media (prefers-reduced-motion: reduce){ .hotelmk .ring{ animation:none; opacity:0 } }
+
+.card{ position:absolute; z-index:1000; left:calc(12px + env(safe-area-inset-left, 0px)); bottom:calc(24px + env(safe-area-inset-bottom, 0px)); width:min(380px, calc(100% - 24px)); background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; box-shadow:0 10px 30px rgba(0,0,0,.2) }
+.card .top{ display:flex; align-items:flex-start; gap:10px }
+.card h2{ font:800 20px/1.15 var(--f-display); margin:0; flex:1; min-width:0 }
+.card .x{ border:0; background:transparent; font-size:22px; line-height:1; cursor:pointer; color:var(--muted); padding:0 2px }
+.meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:8px 0; font-size:12.5px; color:var(--muted) }
+.tag{ font-weight:700; font-size:11.5px; letter-spacing:.05em; color:#fff; border-radius:999px; padding:2px 9px }
+.cost{ font-weight:700; color:var(--ink) }
+.card p{ margin:0 0 10px; font-size:14.5px }
+.card a{ color:var(--focus); font-weight:700; font-size:13.5px; text-decoration:none }
+
+aside{ border-left:1px solid var(--line); background:var(--panel); overflow-y:auto; min-width:0 }
+.grp{ padding:14px 16px 6px }
+.grp h3{ margin:0 0 6px; font:700 11.5px var(--f-body); letter-spacing:.16em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:8px }
+.grp h3 i{ width:10px; height:10px; border-radius:50% }
+.item{ display:flex; gap:10px; align-items:baseline; text-align:left; border:0; background:transparent; padding:7px 8px; margin:0 -8px; border-radius:8px; cursor:pointer; width:calc(100% + 16px) }
+.item:hover{ background:var(--bg) }
+.item.sel{ background:var(--bg); box-shadow:inset 3px 0 0 var(--focus) }
+.item b{ font-weight:600; flex:1; min-width:0 }
+.item span{ font-size:12px; color:var(--muted); white-space:nowrap }
+.item .st{ color:var(--d9) }
+.off{ font-size:13px; color:var(--muted); padding:4px 16px 24px }
+.off a{ color:var(--focus); font-weight:600 }
+
+.metrobtn .roundel{ width:14px; height:14px; border-radius:50%; border:3px solid #dc241f; position:relative; display:inline-block }
+.metrobtn .roundel::after{ content:""; position:absolute; left:-5px; right:-5px; top:50%; height:4px; margin-top:-2px; background:#10308b }
+.metrobtn[aria-pressed="true"]{ background:var(--ink); color:var(--panel) }
+.legend{ position:absolute; z-index:900; right:calc(10px + env(safe-area-inset-right, 0px)); top:10px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:12px; max-width:200px; box-shadow:0 2px 8px rgba(0,0,0,.15) }
+.legend summary{ cursor:pointer; font-weight:700 }
+.legend ul{ list-style:none; margin:6px 0 2px; padding:0; display:grid; gap:3px }
+.legend li{ display:flex; align-items:center; gap:7px }
+.legend li i{ width:18px; height:5px; border-radius:3px; flex:none }
+.stlbl{ background:rgba(255,255,255,.88); border:0; box-shadow:none; padding:0 4px; font:600 11px var(--f-body); color:#1d2a44; border-radius:4px }
+.stlbl::before{ display:none }
+.lowzoom .stlbl{ display:none }
+@media (max-width: 760px){
+  body{ overflow:auto; display:block }
+  main{ display:block }
+  .mapwrap{ height:66vh; min-height:360px }
+  aside{ border-left:0; border-top:1px solid var(--line); overflow:visible }
+  header{ padding-block:10px }
+  .filters{ margin-left:0; flex-wrap:nowrap; overflow-x:auto; width:calc(100% + 32px); margin-right:-16px; margin-left:-16px; padding:2px 16px; scrollbar-width:none; -webkit-overflow-scrolling:touch }
+  .filters::-webkit-scrollbar{ display:none }
+  .chip{ flex:none; padding:7px 13px }
+  h1{ font-size:20px }
+  .mapwrap{ height:calc(100svh - 150px); max-height:680px; min-height:360px }
+  .search{ flex:1 1 100% }
+  .filters.themes{ margin-left:-16px; flex:none }
+  .count{ display:none }
+  .card{ bottom:calc(16px + env(safe-area-inset-bottom, 0px)) }
+  .hotelmk .lbl{ left:auto; right:46px }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1><small>Skopje · 4-7 dicembre 2026</small>Mappa del nostro viaggio</h1>
+  <div class="filters" role="group" aria-label="Filtra per giorno">
+    <button class="chip" data-f="all" aria-pressed="true">Tutti</button>
+    <button class="chip" data-f="4" aria-pressed="false"><i style="background:var(--d6)"></i>Ven 4</button>
+    <button class="chip" data-f="5" aria-pressed="false"><i style="background:var(--d7)"></i>Sab 5</button>
+    <button class="chip" data-f="6" aria-pressed="false"><i style="background:var(--d8)"></i>Dom 6</button>
+    <button class="chip" data-f="7" aria-pressed="false"><i style="background:var(--d9)"></i>Lun 7</button>
+    <button class="chip hotelbtn" id="gohotel"><i></i>La base</button>
+    <button class="chip guidapunti" id="dallaguida" aria-pressed="false"><span class="anello" aria-hidden="true"></span>Dalla guida</button>
+    <a class="chip guidabtn" href="guida/">Guida</a>
+  </div>
+  <div class="row2">
+    <label class="search" for="q">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+      <input id="q" type="search" placeholder="Cerca: bazar, gratis, kebapi…" autocomplete="off" enterkeyhint="search" aria-label="Cerca tra le cose da vedere">
+    </label>
+    <div class="filters themes" id="themes" role="group" aria-label="Filtra per tema"></div>
+    <span class="count" id="count" aria-live="polite"></span>
+  </div>
+</header>
+<main>
+  <div class="mapwrap">
+    <div id="map" aria-label="Mappa di Skopje con i luoghi del viaggio"></div>
+    <div class="card" id="card" hidden>
+      <div class="top"><h2 id="c-name"></h2><button class="x" id="c-close" aria-label="Chiudi">×</button></div>
+      <div class="meta" id="c-meta"></div>
+      <p id="c-text"></p>
+      <a id="c-guida" href="#" hidden>Leggi nella guida ↗</a>
+      <a id="c-link" href="#" target="_blank" rel="noopener">Portami qui con Google Maps ↗</a>
+    </div>
+  </div>
+  <aside id="list" aria-label="Elenco dei luoghi"></aside>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const PLACES = [{"id": "hotel", "n": "Zona Piazza Macedonia", "c": "hotel", "lat": 41.995695, "lon": 21.431248, "cost": "da scegliere", "t": "La nostra base: l'albergo non e ancora scelto, ma sara in questa zona. Tutte le distanze della guida partono da qui. Il Ponte di Pietra e a 4 minuti, il Vecchio Bazar a 8, la fortezza Kale a 10.", "tm": [], "s": true, "d": "hotel"}, {"id": "guerriero", "n": "Guerriero a cavallo", "c": "viste", "lat": 41.995695, "lon": 21.431248, "cost": "gratis", "t": "Dodici metri di bronzo su dieci di piedistallo, fusi a Firenze dalla Fonderia Marinelli e inaugurati l'8 settembre 2011. Ufficialmente e un guerriero generico; tutti sanno che e Alessandro Magno.", "tm": ["Monumenti", "Foto"], "s": true, "d": "4"}, {"id": "pontepietra", "n": "Ponte di Pietra", "c": "viste", "lat": 41.997115, "lon": 21.43325, "cost": "gratis", "t": "Dodici arcate, 214 metri, costruito fra il 1451 e il 1469 per Mehmed II su fondazioni romane. Separa la Skopje di marmo da quella ottomana.", "tm": ["Monumenti", "Foto"], "s": true, "d": "4"}, {"id": "teresa", "n": "Casa memoriale di Madre Teresa", "c": "musei", "lat": 41.993845, "lon": 21.430864, "cost": "gratis", "t": "Dove sorgeva la chiesa del battesimo di Anjeze Gonxhe Bojaxhiu, nata qui nel 1910. Mar-dom 10:00-18:00, chiusa il lunedi. Ingresso e guida gratuiti, ma i gruppi devono prenotare.", "tm": ["Musei"], "s": true, "d": "5"}, {"id": "porta", "n": "Porta Macedonia", "c": "viste", "lat": 41.994451, "lon": 21.43244, "cost": "gratis", "t": "Arco di trionfo costruito fra il 2011 e il gennaio 2012 su piazza Pella, con i fregi della storia macedone.", "tm": ["Monumenti"], "d": "x"}, {"id": "archeologico", "n": "Museo Archeologico della Macedonia", "c": "musei", "lat": 41.996804, "lon": 21.434449, "cost": "400 MKD", "t": "Mar-dom 10:00-18:00, ultimi biglietti alle 17, chiuso il lunedi. Visita guidata compresa nel biglietto.", "tm": ["Musei"], "d": "6"}, {"id": "lotta", "n": "Museo della Lotta Macedone", "c": "musei", "lat": 41.997942, "lon": 21.433187, "cost": "300 MKD", "t": "Un secolo di lotta per l'indipendenza raccontato con statue di cera. Si visita solo con la guida. Mar-dom 10:00-18:00, chiuso il lunedi.", "tm": ["Musei"], "d": "x"}, {"id": "olocausto", "n": "Memoriale dell'Olocausto", "c": "musei", "lat": 41.998466, "lon": 21.433383, "cost": "100 MKD", "t": "Dedicato ai 7.148 ebrei della Macedonia deportati nel marzo 1943. Mar-ven 09:00-19:00, sab-dom 09:00-15:00, chiuso il lunedi.", "tm": ["Musei"], "d": "x"}, {"id": "pontearte", "n": "Ponte dell'Arte", "c": "viste", "lat": 41.995694, "lon": 21.435903, "cost": "gratis", "t": "Ponte pedonale fiancheggiato da una doppia fila di statue di artisti macedoni. Di sera e illuminato.", "tm": ["Foto", "Monumenti"], "d": "6"}, {"id": "stazione", "n": "Vecchia stazione e Museo della Citta", "c": "musei", "lat": 41.990913, "lon": 21.429009, "cost": "gratis", "t": "Mezzo edificio tagliato di netto dal terremoto del 26 luglio 1963, con l'orologio fermo sulle 5:17. Dentro c'e il Museo della Citta di Skopje. Chiuso il lunedi.", "tm": ["Musei", "Foto"], "s": true, "d": "x"}, {"id": "gtc", "n": "Centro commerciale GTC", "c": "trasporti", "lat": 41.994587, "lon": 21.434207, "cost": "gratis", "t": "Cemento a vista degli anni Settanta, uno dei pezzi migliori della ricostruzione modernista. Bar e bagni puliti.", "tm": ["Monumenti"], "d": "x"}, {"id": "klement", "n": "Chiesa di San Clemente di Ocrida", "c": "viste", "lat": 41.998528, "lon": 21.426409, "cost": "gratis", "t": "La cattedrale ortodossa: una cupola di cemento che sembra atterrata. Dentro, affreschi moderni e mosaici dorati.", "tm": ["Monumenti"], "d": "x"}, {"id": "kale", "n": "Fortezza Kale", "c": "viste", "lat": 42.000811, "lon": 21.433029, "cost": "gratis", "t": "Sul punto piu alto della citta. Prima fortezza nel VI secolo, con le pietre della citta romana di Skupi distrutta dal terremoto del 518. Tutti i giorni 07:00-18:00, gratis.", "tm": ["Panorami", "Foto", "Monumenti"], "s": true, "d": "5"}, {"id": "mustafa", "n": "Moschea di Mustafa Pasha", "c": "viste", "lat": 42.002025, "lon": 21.43541, "cost": "gratis", "t": "Del 1492, rimasta intatta. Cupola di 16,3 metri, minareto di 47. Nella turbe accanto e sepolta Umi, figlia del pascia. Giardino di rose sopra il bazar.", "tm": ["Monumenti", "Foto"], "s": true, "d": "5"}, {"id": "spas", "n": "Chiesa di Sveti Spas", "c": "viste", "lat": 42.000825, "lon": 21.435719, "cost": "biglietto", "t": "Meta del Cinquecento, con il pavimento sotto il livello della strada. Dentro, un'iconostasi in legno intagliato completata nel 1824.", "tm": ["Monumenti"], "s": true, "d": "x"}, {"id": "kursumli", "n": "Kursumli An", "c": "viste", "lat": 42.003149, "lon": 21.436844, "cost": "gratis", "t": "Caravanserraglio del Quattro-Cinquecento con stalle per cento cavalli. Le cupole erano rivestite di piombo: da li il nome.", "tm": ["Monumenti", "Foto"], "d": "5"}, {"id": "kapan", "n": "Kapan An", "c": "viste", "lat": 42.000108, "lon": 21.436648, "cost": "gratis", "t": "Caravanserraglio nel cuore del bazar, oggi con ristoranti sotto le volte.", "tm": ["Monumenti"], "d": "5"}, {"id": "suli", "n": "Suli An", "c": "viste", "lat": 42.00166, "lon": 21.437566, "cost": "gratis", "t": "Un altro an ottomano del bazar, oggi sede di facolta e mostre.", "tm": ["Monumenti"], "d": "7"}, {"id": "daut", "n": "Hammam di Daut Pasha, Galleria Nazionale", "c": "musei", "lat": 41.998724, "lon": 21.435724, "cost": "biglietto", "t": "Bagno turco del Quattrocento, oggi sede principale della Galleria Nazionale, fondata nel 1948. Chiusa il lunedi.", "tm": ["Musei", "Monumenti"], "d": "x"}, {"id": "cifte", "n": "Cifte Hammam", "c": "musei", "lat": 42.001129, "lon": 21.437277, "cost": "biglietto", "t": "Il bagno turco doppio, con due ali separate per uomini e donne. Seconda sede della Galleria Nazionale.", "tm": ["Musei"], "d": "5"}, {"id": "saat", "n": "Torre dell'orologio", "c": "viste", "lat": 42.002024, "lon": 21.441321, "cost": "gratis", "t": "Torre in mattoni di epoca ottomana accanto alla moschea del sultano Murat. Non si sale.", "tm": ["Monumenti"], "d": "7"}, {"id": "bitpazar", "n": "Bit Pazar", "c": "cibo", "lat": 42.003719, "lon": 21.439488, "cost": "gratis", "t": "Il mercato vero: peperoni secchi, formaggi, fagioli, ajvar sfuso. La mattina, chiuso la domenica.", "tm": ["Cibo", "Shopping", "Esperienze"], "s": true, "d": "7"}, {"id": "museomk", "n": "Museo della Macedonia", "c": "musei", "lat": 42.002593, "lon": 21.435795, "cost": "biglietto", "t": "Archeologia, storia ed etnografia, nel complesso che ingloba il Kursumli An. Chiuso il lunedi.", "tm": ["Musei"], "d": "x"}, {"id": "funivia", "n": "Funivia del Vodno, Sredno Vodno", "c": "trasporti", "lat": 41.976286, "lon": 21.407455, "cost": "100 MKD", "t": "Stazione di partenza della funivia. Da novembre a marzo 10:00-17:00, ultima salita alle 16:45, chiusa il lunedi. Ci si arriva con il bus 25.", "tm": ["Trasporti"], "d": "5"}, {"id": "croce", "n": "Croce del Millennio", "c": "viste", "lat": 41.96502, "lon": 21.394421, "cost": "100 MKD", "t": "Sessantasei metri d'acciaio sulla cima del Vodno, a 1.066 metri, costruiti nel 2002. Piattaforma su dodici colonne come i dodici apostoli, ascensore interno. Il miglior punto panoramico della citta.", "tm": ["Panorami", "Foto", "Natura"], "s": true, "d": "5"}, {"id": "matka", "n": "Canyon di Matka", "c": "viste", "lat": 41.950194, "lon": 21.299208, "cost": "gratis", "t": "Quindici chilometri a ovest, sul fiume Treska. Cinquemila ettari, dieci grotte, monasteri medievali e il piu antico lago artificiale del Paese. La passerella scavata nella roccia vale da sola il viaggio.", "tm": ["Natura", "Panorami", "Esperienze"], "s": true, "d": "6"}, {"id": "vrelo", "n": "Grotta di Vrelo", "c": "viste", "lat": 41.93016, "lon": 21.292269, "cost": "~400 MKD", "t": "Si raggiunge solo in barca. Due laghi interni, profondi fino a 18 metri; la profondita totale della grotta non e nota. A dicembre le partenze non sono garantite: confermare il giorno prima.", "tm": ["Natura", "Esperienze"], "s": true, "d": "6"}, {"id": "skupi", "n": "Skupi, citta romana", "c": "viste", "lat": 42.016688, "lon": 21.391524, "cost": "biglietto", "t": "Le rovine della citta romana distrutta dal terremoto del 518: teatro, basilica, terme. Le sue pietre finirono nelle mura del Kale.", "tm": ["Monumenti"], "d": "x"}, {"id": "destan", "n": "Destan", "c": "cibo", "lat": 41.999552, "lon": 21.436576, "cost": "~300 MKD", "t": "Kazandziska 4, nel bazar. Aperto nel 1913, fa solo kebapi. Si ordina a cinque o a dieci. Solo contanti.", "tm": ["Cibo"], "s": true, "d": "5"}, {"id": "pivnica", "n": "Pivnica An", "c": "cibo", "lat": 42.000018, "lon": 21.436601, "cost": "~700 MKD", "t": "Dentro Kapan An: birre locali e piatti tradizionali sotto le volte del caravanserraglio. Tel. +389 2 321 2111. Per sei, prenotare.", "tm": ["Cibo", "Esperienze"], "s": true, "d": "5"}, {"id": "merak", "n": "Skopski Merak", "c": "cibo", "lat": 42.001031, "lon": 21.419801, "cost": "~700 MKD", "t": "Debarca 51, a Debar Maalo. Pastrmajlija nel forno a legna, griglia, trilece. Tel. +389 2 321 2215, si prenota anche online. Ven e sab fino a mezzanotte.", "tm": ["Cibo"], "s": true, "d": "4"}, {"id": "soul", "n": "Soul Kitchen", "c": "cibo", "lat": 41.9965, "lon": 21.4339, "cost": "~800 MKD", "t": "Kej 13-ti Noemvri 8, sul lungofiume. Cucina macedone e vini locali. Tel. +389 78 887 733: non prende prenotazioni online, bisogna chiamare.", "tm": ["Cibo"], "d": "6"}, {"id": "serdarot", "n": "Kaj Serdarot", "c": "cibo", "lat": 42.0006, "lon": 21.4345, "cost": "~600 MKD", "t": "Sotto la fortezza Kale, tradizionale e poco turistico. Indirizzo e orari da confermare sul posto.", "tm": ["Cibo"], "d": "x"}];
+const DAYS = {
+  hotel:{ label:"La nostra base", short:"BASE", color:"#e0a93b" },
+  "4":{ label:"Ven 4 · arrivo e cena tarda", short:"VEN 4", color:"#b8402f" },
+  "5":{ label:"Sab 5 · bazar, Kale e il Vodno al tramonto", short:"SAB 5", color:"#26375c" },
+  "6":{ label:"Dom 6 · il canyon di Matka", short:"DOM 6", color:"#2f7272" },
+  "7":{ label:"Lun 7 · spesa nel bazar e aeroporto", short:"LUN 7", color:"#c08a25" },
+  x:{ label:"Se avanza tempo", short:"EXTRA", color:"#8a8275" }
+};
+const CATS = { viste:"Vista e foto", trasporti:"Trasporti", musei:"Musei ed esperienze", cibo:"Da mangiare", hotel:"La base" };
+const THEMES = [["star","★ Da non perdere"],["gratis","Gratis"],["Panorami"],["Foto"],["Monumenti"],["Musei"],["Esperienze"],["Natura"],["Cibo"],["Shopping"]];
+const themesOf = p => [...(p.s ? ["star"] : []), ...(p.cost === "gratis" ? ["gratis"] : []), ...(p.tm || [])];
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+for (const p of PLACES) p.hay = norm([p.n, p.t, p.cost, DAYS[p.d].label, ...(p.tm || []), p.s ? "da non perdere imperdibile" : "", p.cost === "gratis" ? "gratis gratuito free" : ""].join(" "));
+
+const map = L.map('map', { zoomControl:true, tap:true, zoomSnap:0.25, zoomDelta:0.5 }).setView([41.998, 21.4254], 14);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom:19,
+  attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Skopje non ha metropolitana: nessun livello di linee.
+const markers = {};
+for (const p of PLACES){
+  let icon;
+  if (p.c === 'hotel'){
+    icon = L.divIcon({ className:'', iconSize:[44,56], iconAnchor:[22,44],
+      html:'<div class="hotelmk"><div class="ring"></div><div class="drop"></div><div class="h">H</div><div class="lbl">LA NOSTRA BASE</div></div>' });
+  } else {
+    icon = L.divIcon({ className:'', iconSize:[22,22], iconAnchor:[11,11],
+      html:`<div class="pin${p.s ? ' star' : ''}" style="background:${DAYS[p.d].color}">${p.s ? '★' : ''}</div>` });
+  }
+  const m = L.marker([p.lat, p.lon], { icon, title:p.n, riseOnHover:true, zIndexOffset: p.c === 'hotel' ? 1000 : 0, keyboard:true }).addTo(map);
+  m.on('click', () => select(p.id, false));
+  markers[p.id] = { m, p };
+}
+const pinEl = id => markers[id].m.getElement()?.querySelector('.pin');
+
+// livello "Dalla guida": i luoghi descritti nei capitoli, con il link alla pagina
+const GUIDA_PUNTI = [
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 1, "tipo": "s", "nome": "Piazza Macedonia e il Guerriero a cavallo", "t": "È la statua più discussa dei Balcani, e la discussione comincia dal nome.", "pag": 37, "lat": 41.995695, "lon": 21.431248},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 2, "tipo": "s", "nome": "Il Ponte di Pietra", "t": "Dodici arcate di pietra, duecentoquattordici metri, sei di larghezza.", "pag": 39, "lat": 41.997115, "lon": 21.43325},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 3, "tipo": "s", "nome": "Casa memoriale di Madre Teresa", "t": "Anjezë Gonxhe Bojaxhiu nacque a Skopje nel 1910 , da famiglia albanese cattolica, quando la città era ancora ottomana.", "pag": 41, "lat": 41.993845, "lon": 21.430864},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 4, "tipo": "s", "nome": "Porta Macedonia", "t": "Un arco di trionfo alto ventuno metri, costruito fra il 2011 e il gennaio 2012 , con fregi che raccontano la storia macedone dall'antichità all'indipendenza.", "pag": 41, "lat": 41.994451, "lon": 21.43244},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 5, "tipo": "s", "nome": "Museo Archeologico della Macedonia", "t": "Il più grande dei musei nuovi, dentro uno degli edifici più sfacciati del progetto 2014.", "pag": 40, "lat": 41.996804, "lon": 21.434449},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 6, "tipo": "s", "nome": "Museo della Lotta Macedone", "t": "Racconta un secolo di lotta per l'indipendenza con statue di cera e scenografie.", "pag": 40, "lat": 41.997942, "lon": 21.433187},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 7, "tipo": "s", "nome": "Memoriale dell'Olocausto", "t": "Dedicato ai 7.148 ebrei della Macedonia deportati nel marzo del 1943 e uccisi a Treblinka: quasi l'intera comunità, in pochi giorni.", "pag": 40, "lat": 41.998466, "lon": 21.433383},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 8, "tipo": "s", "nome": "Il Ponte dell'Arte", "t": "Un ponte pedonale fiancheggiato da una doppia fila di statue di artisti, musicisti e scrittori macedoni.", "pag": 42, "lat": 41.995694, "lon": 21.435903},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 9, "tipo": "s", "nome": "La vecchia stazione e il Museo della Città", "t": "Il 26 luglio 1963, alle 5:17 del mattino , un terremoto di magnitudo 6,1 rase al suolo l' 80% di Skopje in venti secondi: più di mille morti, duecentomila senza casa.", "pag": 42, "lat": 41.990913, "lon": 21.429009},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 10, "tipo": "s", "nome": "Il centro commerciale GTC", "t": "Un gigantesco centro commerciale in cemento a vista degli anni Settanta, uno dei pezzi migliori della ricostruzione modernista.", "pag": 42, "lat": 41.994587, "lon": 21.434207},
+ {"cid": "01-centro", "cap": "Il centro e Skopje 2014", "colore": "#1b6b63", "n": 11, "tipo": "s", "nome": "Chiesa di San Clemente di Ocrida", "t": "La cattedrale ortodossa della città, costruita alla fine del Novecento: una cupola di cemento che sembra un'astronave atterrata.", "pag": 42, "lat": 41.998528, "lon": 21.426409},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 1, "tipo": "s", "nome": "La fortezza Kale", "t": "Sta sul punto più alto della città e compare sullo stemma di Skopje insieme al Ponte di Pietra.", "pag": 51, "lat": 42.000811, "lon": 21.433029},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 2, "tipo": "s", "nome": "La moschea di Mustafa Pasha", "t": "Costruita nel 1492 , è la moschea più importante di Skopje e una delle poche sopravvissute intatte: nei cinque secoli successivi non le è stato aggiunto nulla.", "pag": 53, "lat": 42.002025, "lon": 21.43541},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 3, "tipo": "s", "nome": "Chiesa di Sveti Spas", "t": "Da fuori è un edificio basso e insignificante, con il pavimento scavato sotto il livello della strada.", "pag": 55, "lat": 42.000825, "lon": 21.435719},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 4, "tipo": "s", "nome": "Kuršumli An", "t": "Il caravanserraglio meglio conservato della città: un quadrato di stanze su due piani attorno a un cortile con la fontana.", "pag": 55, "lat": 42.003149, "lon": 21.436844},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 5, "tipo": "s", "nome": "Kapan An", "t": "{+8} 5 Kapan An p.", "pag": 50, "lat": 42.000108, "lon": 21.436648},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 6, "tipo": "s", "nome": "Suli An", "t": "{+9} 6 Suli An p.", "pag": 50, "lat": 42.00166, "lon": 21.437566},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 7, "tipo": "s", "nome": "Hammam di Daut Pasha · Galleria Nazionale", "t": "Un grande bagno turco del Quattrocento, oggi sede principale della Galleria Nazionale , fondata nel 1948.", "pag": 56, "lat": 41.998724, "lon": 21.435724},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 8, "tipo": "s", "nome": "Čifte Hammam", "t": "L'altro bagno turco, \"doppio\" perché aveva due ali separate per uomini e donne.", "pag": 56, "lat": 42.001129, "lon": 21.437277},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 9, "tipo": "s", "nome": "La torre dell'orologio", "t": "Una torre in mattoni di epoca ottomana, fra le più antiche torri dell'orologio dei Balcani.", "pag": 56, "lat": 42.002024, "lon": 21.441321},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 10, "tipo": "s", "nome": "Bit Pazar", "t": "Il mercato vero: frutta, verdura, formaggi, peperoni secchi a mazzi, sacchi di fagioli.", "pag": 56, "lat": 42.003719, "lon": 21.439488},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 11, "tipo": "s", "nome": "Museo della Macedonia", "t": "Archeologia, etnografia e storia in un unico complesso che ingloba il caravanserraglio.", "pag": 55, "lat": 42.002593, "lon": 21.435795},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 12, "tipo": "m", "nome": "Destan", "t": "Un solo piatto, fatto da più di cent'anni.", "pag": 58, "lat": 41.999552, "lon": 21.436576},
+ {"cid": "02-carsija", "cap": "Il Vecchio Bazar e il Kale", "colore": "#9a4e1e", "n": 13, "tipo": "m", "nome": "Pivnica An", "t": "Si cena sotto le volte di un caravanserraglio, con birre locali e piatti tradizionali — tavče gravče, griglia, selsko meso.", "pag": 58, "lat": 42.000018, "lon": 21.436601},
+ {"cid": "03-fuori", "cap": "Fuori città: Vodno e Matka", "colore": "#3d6b45", "n": 1, "tipo": "s", "nome": "Van privato", "t": "Arriva fino al parcheggio dell'imbarcadero.", "pag": 66, "lat": 41.995695, "lon": 21.431248},
+ {"cid": "03-fuori", "cap": "Fuori città: Vodno e Matka", "colore": "#3d6b45", "n": 2, "tipo": "s", "nome": "Bus 60", "t": "La soluzione economica: un euro a testa. Ma la fermata non è al canyon e il tratto finale si fa a piedi lungo la strada.", "pag": 66, "lat": 41.976286, "lon": 21.407455},
+ {"cid": "03-fuori", "cap": "Fuori città: Vodno e Matka", "colore": "#3d6b45", "n": 3, "tipo": "s", "nome": "La Croce del Millennio", "t": "Sessantasei metri d'acciaio sulla cima, costruiti nel 2002 per i duemila anni del cristianesimo in Macedonia.", "pag": 65, "lat": 41.96502, "lon": 21.394421},
+ {"cid": "03-fuori", "cap": "Fuori città: Vodno e Matka", "colore": "#3d6b45", "n": 4, "tipo": "s", "nome": "Il ristorante dell'imbarcadero, a Matka", "t": "Terrazza sull'acqua, trota del fiume, šopska, birra Skopsko.", "pag": 70, "lat": 41.950194, "lon": 21.299208},
+ {"cid": "03-fuori", "cap": "Fuori città: Vodno e Matka", "colore": "#3d6b45", "n": 5, "tipo": "s", "nome": "La grotta di Vrelo", "t": "Nel canyon ci sono dieci grotte , la più corta di venti metri e la più lunga di 176, più due pozzi verticali profondi una trentina di metri.", "pag": 68, "lat": 41.93016, "lon": 21.292269},
+ {"cid": "03-fuori", "cap": "Fuori città: Vodno e Matka", "colore": "#3d6b45", "n": 6, "tipo": "s", "nome": "Skupi, la città romana", "t": "Le rovine della città romana distrutta dal terremoto del 518 : teatro, basilica, terme.", "pag": 69, "lat": 42.016688, "lon": 21.391524}
+]
+;
+const guidaLayer = L.layerGroup();
+for (const g of GUIDA_PUNTI){
+  L.circleMarker([g.lat, g.lon], { radius:6.5, color:g.colore, weight:3, fillColor:'#fff', fillOpacity:1 })
+    .bindTooltip(g.nome, { direction:'top', offset:[0,-6] })
+    .on('click', () => apriGuida(g)).addTo(guidaLayer);
+}
+function apriGuida(g){
+  if (selected){ pinEl(selected)?.classList.remove('sel'); document.querySelector('.item.sel')?.classList.remove('sel'); selected = null; }
+  document.getElementById('c-name').textContent = g.nome;
+  const meta = document.getElementById('c-meta'); meta.replaceChildren();
+  const tag = document.createElement('span'); tag.className = 'tag'; tag.style.background = g.colore; tag.textContent = 'GUIDA · ' + g.n;
+  const cap = document.createElement('span'); cap.textContent = g.cap;
+  meta.append(tag, cap);
+  document.getElementById('c-text').textContent = g.t;
+  const lg = document.getElementById('c-guida'); lg.hidden = false;
+  lg.textContent = `Leggi nella guida, p. ${g.pag} ↗`; lg.href = `guida/${g.cid}.html#p${g.pag}`;
+  document.getElementById('c-link').href = `https://www.google.com/maps/dir/?api=1&destination=${g.lat},${g.lon}&travelmode=transit`;
+  card.hidden = false;
+}
+document.getElementById('dallaguida').onclick = e => {
+  const on = !map.hasLayer(guidaLayer); on ? guidaLayer.addTo(map) : map.removeLayer(guidaLayer);
+  e.currentTarget.setAttribute('aria-pressed', on);
+};
+
+const card = document.getElementById('card');
+let selected = null;
+function select(id, fly){
+  const { m, p } = markers[id];
+  if (selected){ pinEl(selected)?.classList.remove('sel'); document.querySelector(`.item[data-id="${selected}"]`)?.classList.remove('sel'); }
+  selected = id; pinEl(id)?.classList.add('sel');
+  document.querySelector(`.item[data-id="${id}"]`)?.classList.add('sel');
+  const day = DAYS[p.d];
+  document.getElementById('c-name').textContent = p.n;
+  const meta = document.getElementById('c-meta'); meta.replaceChildren();
+  const tag = document.createElement('span'); tag.className = 'tag'; tag.style.background = day.color; tag.textContent = day.short;
+  if (p.c === 'hotel') tag.style.color = '#1d2a44';
+  const cat = document.createElement('span'); cat.textContent = (p.tm && p.tm.length) ? p.tm.join(' · ') : CATS[p.c];
+  const cost = document.createElement('span'); cost.className = 'cost'; cost.textContent = p.cost;
+  meta.append(tag, cat, '·', cost);
+  document.getElementById('c-text').textContent = (p.s ? '★ Da non perdere. ' : '') + p.t;
+  document.getElementById('c-guida').hidden = true;
+  document.getElementById('c-link').href = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}&travelmode=transit`;
+  card.hidden = false;
+  if (fly){
+    map.stop();
+    // il punto finisce nella parte alta della mappa, sopra la scheda
+    const z = Math.max(map.getZoom(), 16);
+    const c = map.project([p.lat, p.lon], z).add([0, map.getSize().y * 0.22]);
+    map.flyTo(map.unproject(c, z), z, { duration:.6 });
+  }
+}
+document.getElementById('c-close').onclick = () => { card.hidden = true; if (selected){ pinEl(selected)?.classList.remove('sel'); document.querySelector('.item.sel')?.classList.remove('sel'); selected = null; } };
+
+const list = document.getElementById('list');
+for (const d of ['hotel','4','5','6','7','x']){
+  const items = PLACES.filter(p => p.d === d); if (!items.length) continue;
+  const sec = document.createElement('section'); sec.className = 'grp'; sec.dataset.day = d;
+  const h = document.createElement('h3'); const dot = document.createElement('i'); dot.style.background = DAYS[d].color; h.append(dot, DAYS[d].label); sec.append(h);
+  for (const p of items){
+    const b = document.createElement('button'); b.className = 'item'; b.dataset.id = p.id;
+    const n = document.createElement('b'); n.textContent = p.n;
+    if (p.s){ const st = document.createElement('span'); st.className = 'st'; st.textContent = ' ★'; n.append(st); }
+    if (p.tm && p.tm.length){ const tm = document.createElement('span'); tm.className = 'tm'; tm.textContent = p.tm.join(' · '); n.append(tm); }
+    const c = document.createElement('span'); c.textContent = p.cost;
+    b.append(n, c);
+    b.onclick = () => { select(p.id, true); if (window.innerWidth <= 760) document.getElementById('map').scrollIntoView({ behavior:'smooth', block:'start' }); };
+    sec.append(b);
+  }
+  list.append(sec);
+}
+const empty = document.createElement('p'); empty.className = 'empty'; empty.hidden = true; list.append(empty);
+const off = document.createElement('div'); off.className = 'off';
+off.innerHTML = '<div class="grp" style="padding:8px 0 4px"><h3>Da sapere</h3></div>' +
+  '<p style="margin:0 0 6px"><b>L\'albergo non è ancora scelto</b>: sarà in zona Piazza Macedonia. Il segnaposto dorato indica la piazza, da cui partono tutte le distanze della guida.</p>' +
+  '<p style="margin:0 0 6px"><b>I mercatini di Natale aprono il 22 dicembre</b>: durante il nostro viaggio la piazza è ancora spoglia.</p>' +
+  '<p style="margin:0 0 6px"><b>Lunedì</b> musei chiusi e funivia del Vodno ferma: è una giornata di strada.</p>' +
+  '<p style="margin:10px 0 0">★ = da non perdere. Prezzi di novembre 2026, da ricontrollare prima di partire. 61,5 MKD = 1 €.</p>';
+list.append(off);
+
+const allBounds = L.latLngBounds(PLACES.map(p => [p.lat, p.lon]));
+const state = { day:'all', theme:'all', q:'' };
+const matches = p => p.c === 'hotel'
+  || ((state.day === 'all' || p.d === state.day)
+  && (state.theme === 'all' || themesOf(p).includes(state.theme))
+  && (!state.q || state.q.split(/\s+/).every(w => p.hay.includes(w))));
+const filtering = () => state.day !== 'all' || state.theme !== 'all' || state.q;
+function apply(fit){
+  const hits = [];
+  for (const id in markers){
+    const { m, p } = markers[id]; const on = matches(p);
+    m.getElement()?.querySelector('.pin')?.classList.toggle('dim', !on);
+    m.setZIndexOffset(p.c === 'hotel' ? 1000 : on ? 500 : 0);
+    const li = document.querySelector(`.item[data-id="${id}"]`);
+    // l'hotel resta sempre sulla mappa; nell'elenco compare solo senza filtri o se lo si cerca
+    if (li) li.hidden = p.c === 'hotel' ? (filtering() && !(state.q && p.hay.includes(state.q))) : !on;
+    if (on && p.c !== 'hotel') hits.push(p);
+  }
+  document.querySelectorAll('.grp[data-day]').forEach(s => s.hidden = !s.querySelector('.item:not([hidden])'));
+  document.getElementById('count').textContent = filtering() ? `${hits.length} ${hits.length === 1 ? 'luogo' : 'luoghi'}` : '';
+  empty.hidden = hits.length > 0;
+  empty.textContent = 'Nessun luogo trovato. Prova con un\'altra parola o togli un filtro.';
+  if (!fit) return hits;
+  map.stop();
+  if (!filtering()) fitAll(true);
+  else if (hits.length) map.flyToBounds(L.latLngBounds(hits.map(p => [p.lat, p.lon])), { padding:[50,50], duration:.6, maxZoom:16 });
+  return hits;
+}
+document.querySelectorAll('.chip[data-f]').forEach(c => c.onclick = () => {
+  state.day = c.dataset.f;
+  document.querySelectorAll('.chip[data-f]').forEach(x => x.setAttribute('aria-pressed', x === c));
+  apply(true);
+});
+const themesBox = document.getElementById('themes');
+for (const [key, label] of [["all","Tutti i temi"], ...THEMES]){
+  const b = document.createElement('button'); b.className = 'chip t'; b.dataset.t = key; b.textContent = label || key;
+  b.setAttribute('aria-pressed', key === 'all');
+  b.onclick = () => { state.theme = key; themesBox.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', x === b)); apply(true); };
+  themesBox.append(b);
+}
+const q = document.getElementById('q'); let qt;
+q.addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(() => { state.q = norm(q.value.trim()); apply(true); }, 300); });
+q.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); clearTimeout(qt); state.q = norm(q.value.trim()); const h = apply(false); if (h.length) select(h[0].id, true); q.blur(); } });
+document.getElementById('gohotel').onclick = () => select('hotel', true);
+const fitAll = (fly) => {
+  map.invalidateSize();
+  if (fly){ window.innerWidth <= 760 ? map.flyTo([41.9985, 21.4330], 14, { duration:.6 }) : map.flyToBounds(allBounds, { padding:[30,30], maxZoom:14, duration:.6 }); return; }
+  // sul telefono si parte dal centro: piazza, ponte e bazar; su schermo grande si vedono tutti i punti
+  if (window.innerWidth <= 760) map.setView([41.9985, 21.4330], 14);
+  else map.fitBounds(allBounds, { padding:[30,30], maxZoom:14 });
+};
+fitAll();
+window.addEventListener('load', () => setTimeout(fitAll, 50));
+</script>
+</body>
+</html>

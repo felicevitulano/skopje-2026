@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Itinerario · Guida di Skopje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>/* Guida di Londra — stile delle pagine.
+   Stampa: pagine A5 fisse (148 x 210 mm). Schermo: le stesse pagine una sotto l'altra, fluide sotto i 640 px.
+   Ogni capitolo è una "linea della metro" del suo colore (--cap) che corre sul bordo esterno,
+   con una fermata per sezione: la fermata accesa dice dove sei nel capitolo. */
+
+:root{
+  --ink:#1d2a44;        /* blu notte: testo e titoli */
+  --muted:#5f6472;
+  --paper:#fffdf9;      /* carta quasi bianca, per foto nitide */
+  --sand:#f2ebde;       /* fondi dei riquadri */
+  --red:#b8402f; --teal:#2f7272; --mustard:#c08a25; --navy:#26375c;
+  --teal-tint:#e6f0ee; --mustard-tint:#f7eedb;
+  --cap:var(--red);     /* colore del capitolo, ridefinito su ogni capitolo */
+  --f-display:"Fraunces", Georgia, serif;
+  --f-body:"Figtree", "Helvetica Neue", Arial, sans-serif;
+}
+@page{ size:148mm 210mm; margin:0 }
+*{ box-sizing:border-box }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ margin:0; background:#e7e2d8; color:var(--ink); font:400 8.9pt/1.45 var(--f-body); font-variant-numeric:tabular-nums }
+img{ display:block; max-width:100% }
+a{ color:inherit }
+
+/* ---------- pagina ---------- */
+.page{ width:148mm; height:210mm; margin:0 auto 6mm; background:var(--paper); position:relative; overflow:hidden;
+  padding:14mm 17mm 15mm 13mm; break-after:page; display:flex; flex-direction:column; gap:3.2mm }
+.page.sx{ padding:14mm 13mm 15mm 17mm }               /* pagina pari: margine esterno a sinistra */
+@media print{ body{ background:none } .page{ margin:0 } }
+
+.testata{ position:absolute; top:6.5mm; left:13mm; right:17mm; display:flex; justify-content:space-between;
+  font:500 6.8pt var(--f-body); color:var(--muted) }
+.sx .testata{ left:17mm; right:13mm; flex-direction:row-reverse }
+.folio{ position:absolute; bottom:6.5mm; right:17mm; font:600 7.5pt var(--f-body); color:var(--ink) }
+.sx .folio{ right:auto; left:17mm }
+
+/* linea della metro sul bordo esterno */
+.linea{ position:absolute; top:0; bottom:0; right:5.2mm; width:2.2mm; background:var(--cap) }
+.sx .linea{ right:auto; left:5.2mm }
+.linea i{ position:absolute; left:50%; width:4.2mm; height:4.2mm; margin-left:-2.1mm; border-radius:50%;
+  background:#fff; border:.9mm solid var(--cap) }
+.linea i.qui{ width:5.6mm; height:5.6mm; margin-left:-2.8mm; background:var(--ink); border-color:#fff; box-shadow:0 0 0 .6mm var(--cap) }
+
+/* ---------- tipografia ---------- */
+h1,h2,h3,h4{ font-family:var(--f-display); margin:0; color:var(--ink); text-wrap:balance; font-optical-sizing:auto }
+h2{ font-size:21pt; line-height:1.02; font-weight:800; letter-spacing:-.01em }
+h3{ font-size:12.5pt; line-height:1.15; font-weight:700 }
+h4{ font-size:10pt; font-weight:700 }
+p{ margin:0 }
+.testo p + p{ margin-top:2.2mm }
+.testo{ hyphens:auto; -webkit-hyphens:auto }
+.lead{ font:400 11pt/1.38 var(--f-display); color:var(--ink) }
+.sezione{ font:600 8pt var(--f-body); color:var(--cap) }       /* nome della sezione sopra il titolo */
+.piccolo{ font-size:7.6pt; color:var(--muted) }
+.cap{ font-size:6.8pt; color:var(--muted); margin-top:1.2mm; font-style:italic }
+
+/* ---------- foto ---------- */
+.foto{ position:relative; overflow:hidden; border-radius:1.2mm; flex:none }
+.foto img{ width:100%; height:100%; object-fit:cover }
+.foto.al{ margin:0 -17mm 0 -13mm; border-radius:0 }            /* al vivo orizzontale */
+.sx .foto.al{ margin:0 -13mm 0 -17mm }
+
+/* ---------- apertura capitolo ---------- */
+.apertura{ padding:0 }
+.apertura > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
+.apertura .velo{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(20,28,46,.0) 35%, rgba(20,28,46,.86) 82%) }
+.apertura .titolo{ position:absolute; left:13mm; right:17mm; bottom:16mm; color:#fff }
+.apertura .num{ font:600 8pt var(--f-body); color:#fff; opacity:.85 }
+.apertura h1{ font-size:38pt; line-height:.95; font-weight:900; color:#fff; margin:2mm 0 4mm }
+.apertura .sotto{ font:400 10.5pt/1.35 var(--f-display); max-width:100mm; opacity:.95 }
+
+/* ---------- riquadri ---------- */
+.info{ background:var(--teal-tint); border-radius:1.5mm; padding:3mm 3.5mm; display:grid;
+  grid-template-columns:15mm 1fr; gap:1.1mm 3mm; font-size:7.9pt; line-height:1.35; flex:none }
+.info dt{ font-weight:700; color:var(--teal) }
+.info dd{ margin:0 }
+.consiglio{ background:var(--mustard-tint); border-radius:1.5mm; padding:3mm 3.5mm; font-size:8.4pt; flex:none }
+.consiglio h4{ color:#8a5f12; margin-bottom:1mm; display:flex; align-items:center; gap:2mm }
+.consiglio h4::before{ content:""; width:3.4mm; height:3.4mm; border-radius:50%; border:.8mm solid var(--mustard); flex:none }
+.riquadro{ background:var(--sand); border-radius:1.5mm; padding:3.2mm 3.6mm; font-size:8.4pt; flex:none }
+.riquadro h4{ margin-bottom:1.2mm }
+.top-lista{ margin:0; padding:0; list-style:none; display:grid; gap:1.4mm }
+.top-lista li{ display:grid; grid-template-columns:5mm 1fr; gap:2mm; align-items:baseline }
+.top-lista b{ font-family:var(--f-display); font-weight:800; color:var(--cap); font-size:10pt }
+
+/* ---------- schede (da vedere, mangiare...) ---------- */
+.voce{ display:grid; grid-template-columns:6.4mm 1fr; gap:0 2.6mm; break-inside:avoid }
+.voce + .voce{ padding-top:2.6mm; border-top:.25mm solid #e2dacb }
+.n{ width:6.4mm; height:6.4mm; border-radius:50%; background:var(--cap); color:#fff; font:700 7.6pt/6.4mm var(--f-body);
+  text-align:center; grid-row:span 3 }
+.n.m{ background:var(--teal) } .n.b{ background:var(--mustard) } .n.s{ background:var(--navy) }
+.voce h3{ font-size:11pt }
+.voce .dati{ font-size:7.4pt; color:var(--muted); margin:.4mm 0 1mm }
+.voce .dati b{ color:var(--ink); font-weight:600 }
+.voce .con-foto{ display:grid; grid-template-columns:1fr 30mm; gap:3mm; align-items:start }
+.voce .con-foto .foto{ height:22mm }
+.prezzo{ font-family:var(--f-body); font-weight:700; color:var(--teal); font-size:8pt; margin-left:1.5mm }
+
+/* ---------- mappa del capitolo ---------- */
+.mappa-pag{ padding:0 }
+.mappa-pag > img{ position:absolute; inset:0; width:100%; height:100% ; object-fit:cover }
+.mappa-pag .scala{ position:absolute; left:6mm; bottom:5mm; background:rgba(255,253,249,.94); border-radius:1.2mm; padding:1.6mm 2.4mm; font-size:6.6pt; color:var(--muted) }
+.legenda{ columns:2; column-gap:5mm; font-size:7.7pt; line-height:1.3 }
+.legenda h4{ font:700 8pt var(--f-body); color:var(--ink); margin:2.4mm 0 1mm; break-after:avoid; display:flex; align-items:center; gap:1.8mm }
+.legenda h4:first-child{ margin-top:0 }
+.legenda h4 i{ width:3mm; height:3mm; border-radius:50% }
+.legenda ol{ margin:0; padding:0; list-style:none }
+.legenda li{ display:grid; grid-template-columns:5mm 1fr auto; gap:1mm; padding:.45mm 0; break-inside:avoid }
+.legenda li b{ font-weight:700 }
+.legenda li span{ color:var(--muted) }
+
+/* ---------- passeggiata ---------- */
+.tappe{ margin:0; padding:0; list-style:none; position:relative }
+.tappe::before{ content:""; position:absolute; left:2.9mm; top:2mm; bottom:3mm; width:.9mm; background:var(--cap) }
+.tappe li{ position:relative; padding:0 0 2.6mm 9mm; font-size:8.4pt }
+.tappe li::before{ content:attr(data-n); position:absolute; left:0; top:-.3mm; width:6.6mm; height:6.6mm; border-radius:50%;
+  background:#fff; border:.8mm solid var(--cap); font:700 7pt/5mm var(--f-body); text-align:center; color:var(--ink) }
+.tappe b{ font-family:var(--f-display); font-size:9.8pt }
+.tappe .tempo{ color:var(--muted); font-size:7.4pt }
+
+.due{ display:grid; grid-template-columns:1fr 1fr; gap:4mm }
+.spinta{ margin-top:auto }   /* spinge un riquadro in fondo alla pagina */
+
+/* ---------- schermo stretto (sito sul telefono) ---------- */
+@media screen and (max-width: 640px){
+  body{ background:var(--paper); font-size:15px }
+  .page, .page.sx{ width:auto; height:auto; min-height:0; margin:0; padding:22px max(18px, env(safe-area-inset-right, 0px)) 26px max(18px, env(safe-area-inset-left, 0px));
+    border-bottom:1px solid #e2dacb; overflow:visible }
+  .linea, .folio, .testata{ display:none }
+  .foto.al, .sx .foto.al{ margin:0 -18px }
+  .apertura{ min-height:88vh }
+  .apertura .titolo{ left:20px; right:20px; bottom:28px }
+  .mappa-pag{ height:auto }
+  .mappa-pag > img{ position:static; height:auto }
+  .due, .voce .con-foto{ grid-template-columns:1fr }
+  .voce .con-foto .foto{ height:44vw }
+  .legenda{ columns:1 }
+  .foto[style*="height"]{ height:auto !important; aspect-ratio:3/2 }
+  /* sul telefono i caratteri in punti tipografici diventerebbero minuscoli */
+  .riquadro, .consiglio, .tappe li, .card p{ font-size:14.5px }
+  .info, .legenda, .voce .dati, .piccolo, .cap, .lista-crediti{ font-size:13px }
+  .info{ grid-template-columns:76px 1fr }
+  .lead{ font-size:18px } h2{ font-size:30px } .voce h3{ font-size:19px } h3{ font-size:19px } h4{ font-size:16px }
+  .n{ width:28px; height:28px; font-size:13px; line-height:28px }
+  .voce{ grid-template-columns:28px 1fr; gap:0 12px }
+  .riquadro [style*="font-size"]{ font-size:14px !important }
+  .riquadro [style*="grid-template-columns:13mm"]{ grid-template-columns:72px 1fr !important }
+  .riquadro [style*="grid-template-columns:24mm"]{ grid-template-columns:96px 1fr !important }
+}
+
+/* ---------- sommario e indice analitico (generati da costruisci.py) ---------- */
+.sommario{ list-style:none; margin:0; padding:0; display:grid; gap:1.6mm; font-size:9.6pt }
+.sommario li{ display:grid; grid-template-columns:3mm 1fr auto; gap:3mm; align-items:baseline; border-bottom:.25mm dotted #cfc5b2; padding-bottom:1.2mm }
+.sommario li i{ width:3mm; height:3mm; border-radius:50%; align-self:center }
+.sommario li b{ font-family:var(--f-display); font-weight:800 }
+.sommario li.parte{ display:block; border:0; margin-top:2.4mm; font:700 7.5pt var(--f-body); color:var(--muted) }
+.indice{ list-style:none; margin:0; padding:0; columns:2; column-gap:6mm; font-size:7.2pt; line-height:1.3 }
+.indice li{ display:flex; justify-content:space-between; gap:2mm; break-inside:avoid; padding:.35mm 0; border-bottom:.2mm dotted #ddd3c0 }
+.indice b{ font-weight:600; white-space:nowrap }
+@media screen and (max-width: 640px){ .sommario{ font-size:16px } .indice{ columns:1; font-size:14px } }
+
+.page{--cap:#a96a21}
+.lista-crediti{margin:0;padding:0;list-style:none;display:grid;gap:1.4mm;font-size:7pt;line-height:1.3}
+.lista-crediti span{color:var(--muted);word-break:break-all}
+.appunti .righe{flex:1;background:repeating-linear-gradient(transparent 0 7.4mm, #e2dacb 7.4mm 7.65mm)}
+
+.barra-web{display:none}
+@media screen{.barra-web{display:flex;gap:18px;justify-content:center;position:sticky;top:0;z-index:10;
+  padding:10px 16px;background:#1d2a44;font:600 14px var(--f-body)}.barra-web a{color:#fff;text-decoration:none}}
+@media print{.barra-web{display:none}}
+</style></head><body><nav class="barra-web"><a href="./">← Guida</a><a href="p2-itinerario.pdf">Scarica il PDF</a><a href="../">Mappa</a></nav>
+<section id="p21" class="page apertura" data-sez="1" data-nohead><div class="linea" aria-hidden="true"><i class="qui" style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div>
+  <img style="object-position:50% 60%" src="img/foto/pr_vardar.jpg" alt="Il Vardar innevato a Skopje fra il giorno e la notte">
+  <div class="velo"></div>
+  <div class="titolo">
+    <div class="num">Parte 2</div>
+    <h1>Itinerario</h1>
+    <p class="sotto">Due notti piene e tre mezze giornate, incastrate dentro nove ore di luce. Giorno per giorno, con i tempi veri.</p>
+  </div>
+</section>
+<section id="p22" class="page sx" data-sez="2"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i class="qui" style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">22</div>
+  <p class="sezione">In breve</p>
+  <h2>Il viaggio in una pagina</h2>
+  <dl class="info">
+    <dt>Chi</dt><dd>Sei adulti.</dd>
+    <dt>Andata</dt><dd>Ven <b>4 dicembre</b>, Wizz Air, Bari 18:35 → Skopje <b>19:45</b>.</dd>
+    <dt>Ritorno</dt><dd>Lun <b>7 dicembre</b>, Wizz Air, Skopje <b>16:50</b> → Bari 18:00.</dd>
+    <dt>Base</dt><dd>Zona <b>Piazza Macedonia</b>. Tutte le distanze partono da lì.</dd>
+    <dt>Luce</dt><dd>Alba 6:45, tramonto <b>16:05</b>.</dd>
+  </dl>
+  <div class="riquadro">
+    <h4>La logica del programma</h4>
+    <p>Tre vincoli hanno deciso tutto, e non sono negoziabili:</p>
+    <ol class="top-lista" style="margin-top:1.6mm">
+      <li><b>1</b><span><strong>Il bazar si fa di sabato.</strong> La domenica le botteghe sono quasi tutte chiuse.</span></li>
+      <li><b>2</b><span><strong>Il Vodno si fa di sabato.</strong> La funivia è <strong>chiusa il lunedì</strong> e l'ultima salita è alle 16:45.</span></li>
+      <li><b>3</b><span><strong>Il lunedì è una giornata di strada.</strong> Tutti i musei sono chiusi: resta la spesa nel bazar.</span></li>
+    </ol>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Cosa resta fuori</h4>
+    <p>Ocrida (tre ore a tratta) e Tetovo. E i mercatini di Natale, che aprono il <strong>22 dicembre</strong>: p. 12.</p>
+  </div>
+</section>
+<section id="p23" class="page" data-sez="3"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i class="qui" style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">23</div>
+  <p class="sezione">Giorno 1</p>
+  <h2>Venerdì 4 · arrivo e cena tarda</h2>
+  <ol class="tappe">
+    <li data-n="1"><b>Atterraggio a Skopje</b> <span class="tempo">19:45</span><br>Con il solo bagaglio a mano si esce in quindici-venti minuti.</li>
+    <li data-n="2"><b>Van prenotato → base</b> <span class="tempo">20:15</span><br>Venticinque minuti. In camera verso le 20:45. Cambiare in aeroporto solo il minimo.</li>
+    <li data-n="3"><b>Cena da Skopski Merak</b> <span class="tempo">21:15</span><br>Debarca 51, a Debar Maalo: 18 minuti a piedi o 5 di taxi. Il venerdì è aperto fino a mezzanotte. <strong>Prenotare da casa.</strong> Pastrmajlija e griglia.</li>
+    <li data-n="4"><b>Piazza Macedonia di notte</b> <span class="tempo">23:00</span><br>Rientro a piedi passando per la piazza illuminata e il Ponte di Pietra. Venti minuti che valgono la stanchezza.</li>
+  </ol>
+  <div class="consiglio spinta">
+    <h4>Il trucco della prima sera</h4>
+    <p>Date all'autista il <strong>codice del volo</strong>, non solo l'orario: se Wizz ritarda, lui lo sa prima di voi. E scaricate le mappe offline <strong>prima</strong> di partire da Bari: il roaming europeo qui non vale.</p>
+  </div>
+</section>
+<section id="p24" class="page sx" data-sez="4"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i class="qui" style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">24</div>
+  <p class="sezione">Giorno 2</p>
+  <h2>Sabato 5 · il bazar e il Vodno</h2>
+  <div class="testo">
+    <p class="lead">La giornata piena. Tutta la mattina nella città ottomana, il pomeriggio in salita verso il tramonto. Si cammina circa sei chilometri, quasi tutti in piano tranne il Kale.</p>
+  </div>
+  <ol class="tappe">
+    <li data-n="1"><b>Casa di Madre Teresa</b> <span class="tempo">10:00 · 45 min</span><br>Apre alle 10, ingresso e guida gratuiti. <strong>Prenotata da casa</strong>, perché siamo un gruppo. → p. 41</li>
+    <li data-n="2"><b>Piazza e Ponte di Pietra</b> <span class="tempo">10:45 · 30 min</span><br>Il Guerriero a cavallo di giorno, poi si attraversa il fiume. → p. 37</li>
+    <li data-n="3"><b>Vecchio Bazar</b> <span class="tempo">11:15 · 1 ora e mezza</span><br>Čifte Hammam, la via dei calderai, Kuršumli An. Caffè turco obbligatorio. → p. 47</li>
+    <li data-n="4"><b>Pranzo da Destan</b> <span class="tempo">12:45 · 45 min</span><br>Dieci ќebapi a testa. Contanti.</li>
+    <li data-n="5"><b>Moschea di Mustafa Pasha</b> <span class="tempo">13:30 · 30 min</span><br>Del 1492, con il giardino sopra il bazar. → p. 53</li>
+    <li data-n="6"><b>Fortezza Kale</b> <span class="tempo">14:00 · 45 min</span><br>Gratis. Il giro dei bastioni con la città sotto. → p. 51</li>
+  </ol>
+  <div class="consiglio spinta">
+    <h4>Attenzione all'orologio</h4>
+    <p>Alle <strong>14:45 si scende e si parte per il Vodno</strong>, con o senza il bazar finito. L'ultima salita della funivia è alle 16:45 e non si recupera il giorno dopo: domenica si va a Matka e lunedì la funivia è chiusa.</p>
+  </div>
+</section>
+<section id="p25" class="page" data-sez="4"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i class="qui" style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">25</div>
+  <p class="sezione">Giorno 2</p>
+  <h2>Sabato 5 · il tramonto dalla croce</h2>
+  <ol class="tappe">
+    <li data-n="7"><b>Verso Sredno Vodno</b> <span class="tempo">14:45 · 25-30 min</span><br>Due taxi (~300 MKD l'uno) o il bus 25 dalla stazione centrale.</li>
+    <li data-n="8"><b>Funivia</b> <span class="tempo">15:20 · 7 min</span><br>100 MKD a testa. Ultima salita alle 16:45: non è il caso di arrivare al limite.</li>
+    <li data-n="9"><b>Croce del Millennio</b> <span class="tempo">15:30 · 1 ora e un quarto</span><br>Sessantasei metri d'acciaio a 1.066 di quota. <strong>Tramonto alle 16:05.</strong> Vestitevi pesanti: lassù il vento morde. → p. 65</li>
+    <li data-n="10"><b>Ultima discesa</b> <span class="tempo">16:45</span><br>In centro verso le 17:30.</li>
+    <li data-n="11"><b>Cena da Pivnica An</b> <span class="tempo">20:00</span><br>Dentro Kapan An, nel bazar: birre locali e piatti tradizionali sotto le volte del caravanserraglio. <strong>Prenotare.</strong> → p. 57</li>
+  </ol>
+  <div class="riquadro">
+    <h4>Se la funivia non va</h4>
+    <p>D'inverno capita che sia ferma per vento o manutenzione. <strong>Telefonate la mattina.</strong> Piano B: il pomeriggio al <strong>Memoriale dell'Olocausto</strong> (sabato fino alle 19) e al <strong>Museo Archeologico</strong> (fino alle 18), e il Vodno si tenta domenica dopo Matka.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Il trucco</h4>
+    <p>Fatevi lasciare dal taxi alla stazione della funivia, non al parcheggio del Vodno di mezzo: sono due posti diversi e il secondo è più in basso.</p>
+  </div>
+</section>
+<section id="p26" class="page sx" data-sez="5"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i class="qui" style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">26</div>
+  <p class="sezione">Giorno 3</p>
+  <h2>Domenica 6 · il canyon di Matka</h2>
+  <div class="testo">
+    <p class="lead">Mezza giornata fuori città. Domenica è il giorno giusto: il bazar sarebbe chiuso comunque, e Matka d'inverno non ha code.</p>
+  </div>
+  <ol class="tappe">
+    <li data-n="1"><b>Partenza in van</b> <span class="tempo">09:00 · 30-40 min</span><br>Prenotato, con l'ora del ritorno già concordata. 50-60 € andata e ritorno per sei.</li>
+    <li data-n="2"><b>La passerella sul lago</b> <span class="tempo">09:40 · 1 ora</span><br>Il camminamento scavato nella roccia fino al monastero di Sant'Andrea. → p. 67</li>
+    <li data-n="3"><b>Barca alla grotta di Vrelo</b> <span class="tempo">10:45 · 2 ore</span><br>~400 MKD a testa. <strong>Da confermare il giorno prima</strong>: a dicembre le partenze dipendono dal meteo. → p. 68</li>
+    <li data-n="4"><b>Pranzo sul lago</b> <span class="tempo">12:45 · 1 ora</span><br>Al ristorante dell'imbarcadero. Trota, šopska, birra.</li>
+    <li data-n="5"><b>Rientro</b> <span class="tempo">14:00</span><br>In centro verso le 14:45, con un'ora di luce davanti.</li>
+  </ol>
+  <div class="consiglio spinta">
+    <h4>Se le barche non partono</h4>
+    <p>Non è una giornata persa: la passerella e il monastero valgono il viaggio da soli, e si rientra prima. Con il tempo guadagnato si aggiunge il <strong>Museo della Lotta Macedone</strong> nel pomeriggio, o il Vodno se sabato era saltato.</p>
+  </div>
+</section>
+<section id="p27" class="page" data-sez="5"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i class="qui" style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">27</div>
+  <p class="sezione">Giorno 3</p>
+  <h2>Domenica 6 · pomeriggio e sera</h2>
+  <ol class="tappe">
+    <li data-n="6"><b>Museo Archeologico</b> <span class="tempo">15:00 · 1 ora e mezza</span><br>400 MKD, aperto fino alle 18 (ultimi biglietti alle 17), visita guidata compresa. → p. 40</li>
+    <li data-n="7"><b>I ponti illuminati</b> <span class="tempo">16:30 · 45 min</span><br>Il buio è già arrivato: Ponte dell'Arte, Ponte delle Civiltà, la riva sinistra riflessa nel fiume.</li>
+    <li data-n="8"><b>Caffè o rakija calda</b> <span class="tempo">17:30</span><br>Sul lungofiume o sotto i portici della piazza.</li>
+    <li data-n="9"><b>Cena</b> <span class="tempo">20:00</span><br>Soul Kitchen sul lungofiume (Kej 13-ti Noemvri 8, si prenota per telefono) o Kaj Serdarot sotto il Kale. → p. 45</li>
+  </ol>
+  <div class="riquadro">
+    <h4>Attenzione agli orari domenicali</h4>
+    <p>Il <strong>Memoriale dell'Olocausto la domenica chiude alle 15</strong>: se lo volete, va fatto sabato. Il Museo Archeologico e quello della Lotta Macedone restano aperti fino alle 18.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Se piove</h4>
+    <p>Si rovescia la giornata: musei la mattina, Matka il pomeriggio non si può. In quel caso Matka salta e si fa il giro dei quattro musei più la Galleria Nazionale nei due hammam del bazar. Vedi il piano B a p. 29.</p>
+  </div>
+</section>
+<section id="p28" class="page sx" data-sez="6"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i class="qui" style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">28</div>
+  <p class="sezione">Giorno 4</p>
+  <h2>Lunedì 7 · spesa e aeroporto</h2>
+  <div class="testo">
+    <p class="lead">Mezza giornata, e un vincolo: <strong>il lunedì a Skopje è tutto chiuso</strong>. Musei, funivia, molte botteghe della parte bassa. Resta la città all'aperto, che è esattamente quello che serve l'ultimo giorno.</p>
+  </div>
+  <ol class="tappe">
+    <li data-n="1"><b>Check-out, bagagli in deposito</b> <span class="tempo">09:00</span><br>Si lasciano le valigie e si esce leggeri.</li>
+    <li data-n="2"><b>Colazione macedone</b> <span class="tempo">09:30 · 45 min</span><br>Burek tagliato a peso con yogurt da bere o boza, in una pekara vicino alla piazza.</li>
+    <li data-n="3"><b>Bit Pazar e il bazar</b> <span class="tempo">10:15 · 1 ora e mezza</span><br>La spesa: peperoni secchi, tè di montagna, paprika, rame battuto a mano. <strong>Ajvar e rakija solo se qualcuno ha la stiva.</strong> → p. 58</li>
+    <li data-n="4"><b>Ultimo pranzo</b> <span class="tempo">12:00 · 1 ora</span><br>Tavče gravče nel tegame, e un trileće per chiudere.</li>
+    <li data-n="5"><b>Ritiro bagagli</b> <span class="tempo">13:30</span></li>
+    <li data-n="6"><b>Van per l'aeroporto</b> <span class="tempo">13:45 · 25 min</span><br>All'aeroporto per le 14:15, due ore e mezza prima del volo.</li>
+    <li data-n="7"><b>Volo per Bari</b> <span class="tempo">16:50</span><br>Atterraggio alle 18:00.</li>
+  </ol>
+  <div class="consiglio spinta">
+    <h4>Il check-in del ritorno</h4>
+    <p>Si apre <strong>sabato 5 alle 16:50</strong>, mentre siete già là. Fatelo quella sera dal telefono: dopo le 48 ore si paga.</p>
+  </div>
+</section>
+<section id="p29" class="page" data-sez="7"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i class="qui" style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">29</div>
+  <p class="sezione">Piano B</p>
+  <h2>Se piove, se nevica, se tira vento</h2>
+  <div class="testo">
+    <p class="lead">A dicembre c'è circa una probabilità su cinque di pioggia o neve in un giorno qualsiasi. Tre delle cose principali del programma sono all'aperto: ecco con cosa si sostituiscono.</p>
+  </div>
+  <div class="voce">
+    <h3 style="grid-column:1/-1">Al posto del Vodno</h3>
+    <p style="grid-column:1/-1"><strong>Memoriale dell'Olocausto</strong> (sabato fino alle 19, 100 MKD) e <strong>Museo della Lotta Macedone</strong> (fino alle 18, 300 MKD), vicini fra loro sulla riva sinistra. Con la nebbia la croce non si vede comunque: non insistete.</p>
+  </div>
+  <div class="voce">
+    <h3 style="grid-column:1/-1">Al posto di Matka</h3>
+    <p style="grid-column:1/-1"><strong>Galleria Nazionale</strong> nei due hammam del bazar, Daut Pasha e Čifte: arte macedone dal Trecento sotto le cupole ottomane. Più il <strong>Museo della Macedonia</strong> accanto al Kuršumli An, con la sezione etnografica.</p>
+  </div>
+  <div class="voce">
+    <h3 style="grid-column:1/-1">Al posto del bazar sotto l'acqua</h3>
+    <p style="grid-column:1/-1">Il <strong>centro commerciale GTC</strong> e i caffè sotto i portici della piazza: brutto a dirsi, ottimo a farsi. In alternativa il <strong>Museo della Città</strong> nella vecchia stazione, un quarto d'ora a piedi.</p>
+  </div>
+  <div class="riquadro spinta">
+    <h4>Le due telefonate che evitano i guai</h4>
+    <p>La sera prima, sempre: <strong>le barche di Matka partono domani?</strong> e <strong>la funivia del Vodno è in servizio?</strong>. Sono le due uniche cose del viaggio che possono saltare senza preavviso.</p>
+  </div>
+</section>
+<section id="p30" class="page sx" data-sez="8"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i class="qui" style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">30</div>
+  <p class="sezione">Registro</p>
+  <h2>Cosa è cambiato</h2>
+  <div class="testo">
+    <p class="lead">Questa pagina tiene traccia delle modifiche all'itinerario, con la data. Chi ha stampato una versione vecchia vede subito le differenze.</p>
+  </div>
+  <dl class="info">
+    <dt>7 nov 2026</dt><dd>Prima stesura dell'itinerario. Bazar e Vodno di sabato, Matka di domenica, lunedì di strada.</dd>
+    <dt>7 nov 2026</dt><dd>Corretto l'orario della <b>casa di Madre Teresa</b>: apre alle <b>10:00</b> ed è <b>chiusa il lunedì</b>, non lun-ven 9-20 come risultava da una prima ricerca. Spostata a sabato mattina.</dd>
+    <dt>7 nov 2026</dt><dd>Il <b>Memoriale dell'Olocausto</b> la domenica chiude alle 15: tolto dal pomeriggio di domenica, indicato come alternativa del sabato.</dd>
+  </dl>
+  <div class="riquadro">
+    <h4>Ancora da decidere</h4>
+    <ol class="top-lista" style="margin-top:1.6mm">
+      <li><b>1</b><span><strong>L'albergo.</strong> Sarà in zona Piazza Macedonia, ma va scelto e vanno disdette le altre prenotazioni.</span></li>
+      <li><b>2</b><span><strong>La cena di domenica</strong>: lungofiume o sotto il Kale.</span></li>
+      <li><b>3</b><span><strong>Il Museo della Lotta Macedone</strong>, se vale le 300 MKD o se basta l'Archeologico.</span></li>
+    </ol>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Come si modifica</h4>
+    <p>L'itinerario è l'unica parte della guida che parla dei nostri giorni. Se cambia un giorno si corregge <strong>solo qui</strong>: i capitoli delle zone restano validi comunque, perché non nominano mai le nostre date.</p>
+  </div>
+</section>
+<section id="p31" class="page crediti" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">31</div><p class="sezione">Crediti fotografici</p><h2>Le foto di questo capitolo</h2><p class="piccolo">Foto da Wikimedia Commons, pubblicate con licenze Creative Commons o in pubblico dominio. Mappe: Esri, HERE, Garmin e i contributori di OpenStreetMap. Dati stradali: OpenStreetMap.</p><ul class="lista-crediti"><li><b>pr_vardar</b>: Alex Spasov, CC BY 3.0, <span>commons.wikimedia.org/wiki/File:Day_To_Night_Winter_Edition_(194132599).jpeg</span></li></ul></section>
+<section id="p32" class="page sx appunti" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Itinerario</span><span>Parte 2</span></div><div class="folio">32</div><p class="sezione">Appunti</p><div class="righe"></div></section>
+<script>
+// segnala le pagine troppo piene (in stampa il testo verrebbe tagliato)
+window.addEventListener('load', () => {
+  const piene = [...document.querySelectorAll('.page')].filter(p => p.scrollHeight > p.clientHeight + 2)
+    .map((p, i) => p.querySelector('.folio')?.textContent || 'apertura');
+  document.body.dataset.piene = piene.join(',');
+});
+</script>
+</body></html>

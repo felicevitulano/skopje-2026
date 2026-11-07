@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il Vecchio Bazar e il Kale · Guida di Skopje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>/* Guida di Londra — stile delle pagine.
+   Stampa: pagine A5 fisse (148 x 210 mm). Schermo: le stesse pagine una sotto l'altra, fluide sotto i 640 px.
+   Ogni capitolo è una "linea della metro" del suo colore (--cap) che corre sul bordo esterno,
+   con una fermata per sezione: la fermata accesa dice dove sei nel capitolo. */
+
+:root{
+  --ink:#1d2a44;        /* blu notte: testo e titoli */
+  --muted:#5f6472;
+  --paper:#fffdf9;      /* carta quasi bianca, per foto nitide */
+  --sand:#f2ebde;       /* fondi dei riquadri */
+  --red:#b8402f; --teal:#2f7272; --mustard:#c08a25; --navy:#26375c;
+  --teal-tint:#e6f0ee; --mustard-tint:#f7eedb;
+  --cap:var(--red);     /* colore del capitolo, ridefinito su ogni capitolo */
+  --f-display:"Fraunces", Georgia, serif;
+  --f-body:"Figtree", "Helvetica Neue", Arial, sans-serif;
+}
+@page{ size:148mm 210mm; margin:0 }
+*{ box-sizing:border-box }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+body{ margin:0; background:#e7e2d8; color:var(--ink); font:400 8.9pt/1.45 var(--f-body); font-variant-numeric:tabular-nums }
+img{ display:block; max-width:100% }
+a{ color:inherit }
+
+/* ---------- pagina ---------- */
+.page{ width:148mm; height:210mm; margin:0 auto 6mm; background:var(--paper); position:relative; overflow:hidden;
+  padding:14mm 17mm 15mm 13mm; break-after:page; display:flex; flex-direction:column; gap:3.2mm }
+.page.sx{ padding:14mm 13mm 15mm 17mm }               /* pagina pari: margine esterno a sinistra */
+@media print{ body{ background:none } .page{ margin:0 } }
+
+.testata{ position:absolute; top:6.5mm; left:13mm; right:17mm; display:flex; justify-content:space-between;
+  font:500 6.8pt var(--f-body); color:var(--muted) }
+.sx .testata{ left:17mm; right:13mm; flex-direction:row-reverse }
+.folio{ position:absolute; bottom:6.5mm; right:17mm; font:600 7.5pt var(--f-body); color:var(--ink) }
+.sx .folio{ right:auto; left:17mm }
+
+/* linea della metro sul bordo esterno */
+.linea{ position:absolute; top:0; bottom:0; right:5.2mm; width:2.2mm; background:var(--cap) }
+.sx .linea{ right:auto; left:5.2mm }
+.linea i{ position:absolute; left:50%; width:4.2mm; height:4.2mm; margin-left:-2.1mm; border-radius:50%;
+  background:#fff; border:.9mm solid var(--cap) }
+.linea i.qui{ width:5.6mm; height:5.6mm; margin-left:-2.8mm; background:var(--ink); border-color:#fff; box-shadow:0 0 0 .6mm var(--cap) }
+
+/* ---------- tipografia ---------- */
+h1,h2,h3,h4{ font-family:var(--f-display); margin:0; color:var(--ink); text-wrap:balance; font-optical-sizing:auto }
+h2{ font-size:21pt; line-height:1.02; font-weight:800; letter-spacing:-.01em }
+h3{ font-size:12.5pt; line-height:1.15; font-weight:700 }
+h4{ font-size:10pt; font-weight:700 }
+p{ margin:0 }
+.testo p + p{ margin-top:2.2mm }
+.testo{ hyphens:auto; -webkit-hyphens:auto }
+.lead{ font:400 11pt/1.38 var(--f-display); color:var(--ink) }
+.sezione{ font:600 8pt var(--f-body); color:var(--cap) }       /* nome della sezione sopra il titolo */
+.piccolo{ font-size:7.6pt; color:var(--muted) }
+.cap{ font-size:6.8pt; color:var(--muted); margin-top:1.2mm; font-style:italic }
+
+/* ---------- foto ---------- */
+.foto{ position:relative; overflow:hidden; border-radius:1.2mm; flex:none }
+.foto img{ width:100%; height:100%; object-fit:cover }
+.foto.al{ margin:0 -17mm 0 -13mm; border-radius:0 }            /* al vivo orizzontale */
+.sx .foto.al{ margin:0 -13mm 0 -17mm }
+
+/* ---------- apertura capitolo ---------- */
+.apertura{ padding:0 }
+.apertura > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
+.apertura .velo{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(20,28,46,.0) 35%, rgba(20,28,46,.86) 82%) }
+.apertura .titolo{ position:absolute; left:13mm; right:17mm; bottom:16mm; color:#fff }
+.apertura .num{ font:600 8pt var(--f-body); color:#fff; opacity:.85 }
+.apertura h1{ font-size:38pt; line-height:.95; font-weight:900; color:#fff; margin:2mm 0 4mm }
+.apertura .sotto{ font:400 10.5pt/1.35 var(--f-display); max-width:100mm; opacity:.95 }
+
+/* ---------- riquadri ---------- */
+.info{ background:var(--teal-tint); border-radius:1.5mm; padding:3mm 3.5mm; display:grid;
+  grid-template-columns:15mm 1fr; gap:1.1mm 3mm; font-size:7.9pt; line-height:1.35; flex:none }
+.info dt{ font-weight:700; color:var(--teal) }
+.info dd{ margin:0 }
+.consiglio{ background:var(--mustard-tint); border-radius:1.5mm; padding:3mm 3.5mm; font-size:8.4pt; flex:none }
+.consiglio h4{ color:#8a5f12; margin-bottom:1mm; display:flex; align-items:center; gap:2mm }
+.consiglio h4::before{ content:""; width:3.4mm; height:3.4mm; border-radius:50%; border:.8mm solid var(--mustard); flex:none }
+.riquadro{ background:var(--sand); border-radius:1.5mm; padding:3.2mm 3.6mm; font-size:8.4pt; flex:none }
+.riquadro h4{ margin-bottom:1.2mm }
+.top-lista{ margin:0; padding:0; list-style:none; display:grid; gap:1.4mm }
+.top-lista li{ display:grid; grid-template-columns:5mm 1fr; gap:2mm; align-items:baseline }
+.top-lista b{ font-family:var(--f-display); font-weight:800; color:var(--cap); font-size:10pt }
+
+/* ---------- schede (da vedere, mangiare...) ---------- */
+.voce{ display:grid; grid-template-columns:6.4mm 1fr; gap:0 2.6mm; break-inside:avoid }
+.voce + .voce{ padding-top:2.6mm; border-top:.25mm solid #e2dacb }
+.n{ width:6.4mm; height:6.4mm; border-radius:50%; background:var(--cap); color:#fff; font:700 7.6pt/6.4mm var(--f-body);
+  text-align:center; grid-row:span 3 }
+.n.m{ background:var(--teal) } .n.b{ background:var(--mustard) } .n.s{ background:var(--navy) }
+.voce h3{ font-size:11pt }
+.voce .dati{ font-size:7.4pt; color:var(--muted); margin:.4mm 0 1mm }
+.voce .dati b{ color:var(--ink); font-weight:600 }
+.voce .con-foto{ display:grid; grid-template-columns:1fr 30mm; gap:3mm; align-items:start }
+.voce .con-foto .foto{ height:22mm }
+.prezzo{ font-family:var(--f-body); font-weight:700; color:var(--teal); font-size:8pt; margin-left:1.5mm }
+
+/* ---------- mappa del capitolo ---------- */
+.mappa-pag{ padding:0 }
+.mappa-pag > img{ position:absolute; inset:0; width:100%; height:100% ; object-fit:cover }
+.mappa-pag .scala{ position:absolute; left:6mm; bottom:5mm; background:rgba(255,253,249,.94); border-radius:1.2mm; padding:1.6mm 2.4mm; font-size:6.6pt; color:var(--muted) }
+.legenda{ columns:2; column-gap:5mm; font-size:7.7pt; line-height:1.3 }
+.legenda h4{ font:700 8pt var(--f-body); color:var(--ink); margin:2.4mm 0 1mm; break-after:avoid; display:flex; align-items:center; gap:1.8mm }
+.legenda h4:first-child{ margin-top:0 }
+.legenda h4 i{ width:3mm; height:3mm; border-radius:50% }
+.legenda ol{ margin:0; padding:0; list-style:none }
+.legenda li{ display:grid; grid-template-columns:5mm 1fr auto; gap:1mm; padding:.45mm 0; break-inside:avoid }
+.legenda li b{ font-weight:700 }
+.legenda li span{ color:var(--muted) }
+
+/* ---------- passeggiata ---------- */
+.tappe{ margin:0; padding:0; list-style:none; position:relative }
+.tappe::before{ content:""; position:absolute; left:2.9mm; top:2mm; bottom:3mm; width:.9mm; background:var(--cap) }
+.tappe li{ position:relative; padding:0 0 2.6mm 9mm; font-size:8.4pt }
+.tappe li::before{ content:attr(data-n); position:absolute; left:0; top:-.3mm; width:6.6mm; height:6.6mm; border-radius:50%;
+  background:#fff; border:.8mm solid var(--cap); font:700 7pt/5mm var(--f-body); text-align:center; color:var(--ink) }
+.tappe b{ font-family:var(--f-display); font-size:9.8pt }
+.tappe .tempo{ color:var(--muted); font-size:7.4pt }
+
+.due{ display:grid; grid-template-columns:1fr 1fr; gap:4mm }
+.spinta{ margin-top:auto }   /* spinge un riquadro in fondo alla pagina */
+
+/* ---------- schermo stretto (sito sul telefono) ---------- */
+@media screen and (max-width: 640px){
+  body{ background:var(--paper); font-size:15px }
+  .page, .page.sx{ width:auto; height:auto; min-height:0; margin:0; padding:22px max(18px, env(safe-area-inset-right, 0px)) 26px max(18px, env(safe-area-inset-left, 0px));
+    border-bottom:1px solid #e2dacb; overflow:visible }
+  .linea, .folio, .testata{ display:none }
+  .foto.al, .sx .foto.al{ margin:0 -18px }
+  .apertura{ min-height:88vh }
+  .apertura .titolo{ left:20px; right:20px; bottom:28px }
+  .mappa-pag{ height:auto }
+  .mappa-pag > img{ position:static; height:auto }
+  .due, .voce .con-foto{ grid-template-columns:1fr }
+  .voce .con-foto .foto{ height:44vw }
+  .legenda{ columns:1 }
+  .foto[style*="height"]{ height:auto !important; aspect-ratio:3/2 }
+  /* sul telefono i caratteri in punti tipografici diventerebbero minuscoli */
+  .riquadro, .consiglio, .tappe li, .card p{ font-size:14.5px }
+  .info, .legenda, .voce .dati, .piccolo, .cap, .lista-crediti{ font-size:13px }
+  .info{ grid-template-columns:76px 1fr }
+  .lead{ font-size:18px } h2{ font-size:30px } .voce h3{ font-size:19px } h3{ font-size:19px } h4{ font-size:16px }
+  .n{ width:28px; height:28px; font-size:13px; line-height:28px }
+  .voce{ grid-template-columns:28px 1fr; gap:0 12px }
+  .riquadro [style*="font-size"]{ font-size:14px !important }
+  .riquadro [style*="grid-template-columns:13mm"]{ grid-template-columns:72px 1fr !important }
+  .riquadro [style*="grid-template-columns:24mm"]{ grid-template-columns:96px 1fr !important }
+}
+
+/* ---------- sommario e indice analitico (generati da costruisci.py) ---------- */
+.sommario{ list-style:none; margin:0; padding:0; display:grid; gap:1.6mm; font-size:9.6pt }
+.sommario li{ display:grid; grid-template-columns:3mm 1fr auto; gap:3mm; align-items:baseline; border-bottom:.25mm dotted #cfc5b2; padding-bottom:1.2mm }
+.sommario li i{ width:3mm; height:3mm; border-radius:50%; align-self:center }
+.sommario li b{ font-family:var(--f-display); font-weight:800 }
+.sommario li.parte{ display:block; border:0; margin-top:2.4mm; font:700 7.5pt var(--f-body); color:var(--muted) }
+.indice{ list-style:none; margin:0; padding:0; columns:2; column-gap:6mm; font-size:7.2pt; line-height:1.3 }
+.indice li{ display:flex; justify-content:space-between; gap:2mm; break-inside:avoid; padding:.35mm 0; border-bottom:.2mm dotted #ddd3c0 }
+.indice b{ font-weight:600; white-space:nowrap }
+@media screen and (max-width: 640px){ .sommario{ font-size:16px } .indice{ columns:1; font-size:14px } }
+
+.page{--cap:#9a4e1e}
+.lista-crediti{margin:0;padding:0;list-style:none;display:grid;gap:1.4mm;font-size:7pt;line-height:1.3}
+.lista-crediti span{color:var(--muted);word-break:break-all}
+.appunti .righe{flex:1;background:repeating-linear-gradient(transparent 0 7.4mm, #e2dacb 7.4mm 7.65mm)}
+
+.barra-web{display:none}
+@media screen{.barra-web{display:flex;gap:18px;justify-content:center;position:sticky;top:0;z-index:10;
+  padding:10px 16px;background:#1d2a44;font:600 14px var(--f-body)}.barra-web a{color:#fff;text-decoration:none}}
+@media print{.barra-web{display:none}}
+</style></head><body><nav class="barra-web"><a href="./">← Guida</a><a href="02-carsija.pdf">Scarica il PDF</a><a href="../">Mappa</a></nav>
+<section id="p47" class="page apertura" data-sez="1" data-nohead><div class="linea" aria-hidden="true"><i class="qui" style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div>
+  <img style="object-position:50% 40%" src="img/foto/b_apertura.jpg" alt="Un vicolo in salita del Vecchio Bazar di Skopje, con case basse e pavimentazione in pietra">
+  <div class="velo"></div>
+  <div class="titolo">
+    <div class="num">Zone</div>
+    <h1>Il Vecchio Bazar<br>e il Kale</h1>
+    <p class="sotto">Il più grande bazar ottomano dei Balcani dopo Istanbul: trenta moschee, caravanserragli, hammam e una fortezza del Sesto secolo.</p>
+  </div>
+</section>
+<section id="p48" class="page sx" data-sez="1"><div class="linea" aria-hidden="true"><i class="qui" style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">48</div>
+  <p class="sezione">Perché andarci</p>
+  <h2>Ottocento anni di mercato</h2>
+  <div class="testo">
+    <p class="lead">Si attraversa il Ponte di Pietra e si cambia città. Vicoli stretti in salita, botteghe di un metro e mezzo, odore di carbonella e caffè. Qui si commercia <strong>almeno dal Dodicesimo secolo</strong>.</p>
+    <p>Il bazar occupa la riva orientale del Vardar e sale dalla fortezza fino al mercato di Bit Pazar. Dell'epoca ottomana restano una <strong>trentina di moschee</strong>, diversi <i>an</i> — i caravanserragli dove dormivano i mercanti con i cavalli — e due hammam oggi trasformati in gallerie.</p>
+    <p>Non è un bazar ricostruito per i turisti: è il posto dove la gente compra ancora le scarpe, l'oro per i matrimoni e le verdure. La parte alta, verso Bit Pazar, è a maggioranza albanese e parla una lingua diversa da quella dall'altra parte del ponte.</p>
+  </div>
+  <dl class="info">
+    <dt>Quanto serve</dt><dd>Mezza giornata abbondante, pranzo compreso. Il Kale un'altra ora.</dd>
+    <dt>Quando</dt><dd>Botteghe aperte <b>9/10-18/19</b>. <b>La domenica è quasi tutto chiuso</b>: venite di sabato. Ќebapčilnica e caffè restano aperti fino alle 21.</dd>
+    <dt>Dalla piazza</dt><dd><b>8 minuti</b> a piedi fino all'ingresso, 10 al Kale. Tutto il capitolo si gira a piedi.</dd>
+    <dt>Contanti</dt><dd>Indispensabili: molte botteghe e tutte le ќebapčilnica non prendono carte.</dd>
+  </dl>
+  <div class="consiglio spinta">
+    <h4>Il trucco</h4>
+    <p>Entrate dal Ponte di Pietra e salite senza mappa per la prima mezz'ora: il bazar è piccolo e si gira meglio perdendosi. La mappa serve dopo, per non saltare i tre o quattro posti che contano.</p>
+  </div>
+</section>
+<section id="p49" class="page mappa-pag" data-sez="2" data-nohead><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i class="qui" style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div>
+  <img src="img/mappa-02-carsija.jpg" alt="Mappa del Vecchio Bazar di Skopje con i luoghi numerati">
+  <div class="scala">Numeri marroni: da vedere · verdi: mangiare · il bazar sale da sud-ovest verso Bit Pazar</div>
+</section>
+<section id="p50" class="page sx" data-sez="3"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i class="qui" style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">50</div>
+  <p class="sezione">La mappa</p>
+  <h2>Tutti i luoghi del capitolo</h2>
+  <div class="legenda">
+    <h4><i style="background:var(--cap)"></i>Top sight</h4>
+    <ol>
+      <li><b>1</b>Fortezza Kale<span>p. 51</span></li>
+      <li><b>2</b>Moschea di Mustafa Pasha<span>p. 53</span></li>
+    </ol>
+    <h4><i style="background:var(--cap)"></i>Da vedere</h4>
+    <ol>
+      <li><b>3</b>Chiesa di Sveti Spas<span>p. 55</span></li>
+      <li><b>4</b>Kuršumli An<span>p. 55</span></li>
+      <li><b>5</b>Kapan An<span>p. 56</span></li>
+      <li><b>6</b>Suli An<span>p. 56</span></li>
+      <li><b>7</b>Hammam di Daut Pasha<span>p. 56</span></li>
+      <li><b>8</b>Čifte Hammam<span>p. 56</span></li>
+      <li><b>9</b>Torre dell'orologio<span>p. 56</span></li>
+      <li><b>10</b>Bit Pazar<span>p. 56</span></li>
+      <li><b>11</b>Museo della Macedonia<span>p. 55</span></li>
+    </ol>
+    <h4><i style="background:var(--teal)"></i>Mangiare</h4>
+    <ol>
+      <li><b>12</b>Destan<span>p. 57</span></li>
+      <li><b>13</b>Pivnica An<span>p. 57</span></li>
+    </ol>
+  </div>
+  <div class="riquadro spinta">
+    <h4>Orientarsi</h4>
+    <p>Dal Ponte di Pietra il bazar sale verso nord-est. Due assi: la via dei <strong>calderai</strong> (Kazandžiska), che parte dal ponte, e la salita verso la <strong>moschea di Mustafa Pasha</strong> e il <strong>Kale</strong>, sulla sinistra. In fondo, a nord, il mercato di <strong>Bit Pazar</strong>. Da un capo all'altro sono dieci minuti di cammino.</p>
+  </div>
+</section>
+<section id="p51" class="page" data-sez="4"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i class="qui" style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">51</div>
+  <p class="sezione">Top sight · 1</p>
+  <h2>La fortezza Kale</h2>
+  <div class="foto" style="height:52mm"><img src="img/foto/b_kale.jpg" alt="Le mura della fortezza Kale con la bandiera e la città di Skopje sotto"></div>
+  <p class="cap">Dalle mura si vede tutta la città e, dietro, il monte Vodno con la croce.</p>
+  <div class="testo">
+    <p class="lead">Sta sul punto più alto della città e compare sullo stemma di Skopje insieme al Ponte di Pietra. Si entra gratis, tutti i giorni, e non c'è mai coda.</p>
+    <p>La prima fortezza fu costruita nel <strong>Sesto secolo</strong>, probabilmente sotto l'imperatore <strong>Giustiniano</strong>, in calcare giallo e travertino. Le pietre vennero dalla città romana di <strong>Skupi</strong>, che un terremoto aveva distrutto nel <strong>518</strong>: la stessa cosa che sarebbe successa a Skopje quattordici secoli dopo.</p>
+  </div>
+  <dl class="info spinta">
+    <dt>Dove</dt><dd>Sopra il bazar, <b>10 minuti</b> dalla piazza.</dd>
+    <dt>Orari</dt><dd>Tutti i giorni <b>07:00-18:00</b>.</dd>
+    <dt>Prezzo</dt><dd><b>Gratis.</b></dd>
+    <dt>Quanto serve</dt><dd>Un'ora per fare il giro dei bastioni con calma.</dd>
+  </dl>
+</section>
+<section id="p52" class="page sx" data-sez="5"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i class="qui" style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">52</div>
+  <p class="sezione">Top sight · 1</p>
+  <h2>Cosa si vede dalle mura</h2>
+  <div class="testo">
+    <p>Il colle è abitato dal Neolitico, cioè da circa seimila anni. Quello che si cammina oggi è soprattutto bizantino e ottomano, rimaneggiato dopo ogni guerra e ogni terremoto. Le mura sono state risistemate dopo il sisma del 1963 e sono percorribili quasi per intero.</p>
+    <p>Dal bastione nord si guardano i tetti del bazar, i minareti e, oltre, i palazzoni di Čair. Dal lato sud c'è il Vardar, il centro di marmo e, sul fondo, il <strong>monte Vodno</strong> con la croce illuminata. È il punto migliore per capire in un colpo solo come è fatta Skopje.</p>
+  </div>
+  <div class="riquadro">
+    <h4>Lo sapevi?</h4>
+    <p>Gli scavi dentro la fortezza hanno portato alla luce strati su strati: neolitico, romano, bizantino, ottomano. Negli anni Duemila i lavori si bloccarono per una polemica politica su cosa ricostruire e cosa no — un piccolo assaggio delle discussioni che qualche anno dopo avrebbero accompagnato Skopje 2014.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>A dicembre</h4>
+    <p>La fortezza chiude alle 18, ma alle 16:05 è già buio e non si vede più niente. <strong>Salite entro le 15</strong>, o perdete la vista che è l'unico motivo per andarci. Le mura sono senza parapetto in più punti: con il ghiaccio, attenzione.</p>
+  </div>
+</section>
+<section id="p53" class="page" data-sez="6"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i class="qui" style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">53</div>
+  <p class="sezione">Top sight · 2</p>
+  <h2>La moschea di Mustafa Pasha</h2>
+  <div class="foto" style="height:50mm"><img src="img/foto/pi_mustafa.jpg" alt="La moschea di Mustafa Pasha con il minareto e la cupola"></div>
+  <div class="testo">
+    <p class="lead">Costruita nel <strong>1492</strong>, è la moschea più importante di Skopje e una delle poche sopravvissute intatte: nei cinque secoli successivi non le è stato aggiunto nulla.</p>
+    <p>La volle <strong>Çoban Mustafa Pascià</strong>, che sarebbe poi diventato visir alla corte del sultano Selim I. Sta su un terrazzo sopra il bazar, con un giardino di rose e la <i>türbe</i>, il mausoleo, dove è sepolta <strong>Umi</strong>, la figlia del pascià.</p>
+  </div>
+  <dl class="info spinta">
+    <dt>Dove</dt><dd>Sulla salita verso il Kale, sopra il bazar.</dd>
+    <dt>Misure</dt><dd>Cupola di <b>16,3 metri</b> di diametro, minareto di <b>47 metri</b>.</dd>
+    <dt>Ingresso</dt><dd>Libero, <b>fuori dagli orari di preghiera</b>. Scarpe fuori, spalle e ginocchia coperte, velo per le donne.</dd>
+    <dt>Restauro</dt><dd>Cinque anni di lavori finanziati dalla Turchia, conclusi nell'agosto <b>2011</b>.</dd>
+  </dl>
+</section>
+<section id="p54" class="page sx" data-sez="7"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i class="qui" style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">54</div>
+  <p class="sezione">Top sight · 2</p>
+  <h2>Dentro, e il giardino</h2>
+  <div class="testo">
+    <p>Sopra il portone c'è una lastra di marmo con un'iscrizione in arabo. Dentro, la sala è quadrata e quasi spoglia, con la grande cupola sopra la testa: architettura di scuola costantinopolitana, costruita vent'anni dopo la caduta di Costantinopoli dagli stessi cantieri imperiali.</p>
+    <p>Il terremoto del 1963 la danneggiò e fu riparata. Il restauro turco degli anni Duemila ha rimesso a posto il minareto e le decorazioni.</p>
+  </div>
+  <div class="foto" style="height:40mm"><img src="img/foto/b_bazar.jpg" alt="Un vicolo del Vecchio Bazar con le botteghe e un minareto"></div>
+  <div class="riquadro">
+    <h4>Il giardino</h4>
+    <p>Il terrazzo davanti alla moschea è uno dei posti più tranquilli della città e si affaccia sui tetti del bazar. C'è una fontana per le abluzioni, qualche panchina e le rose. D'inverno è vuoto e vale la pausa di dieci minuti anche solo per il silenzio.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Come comportarsi</h4>
+    <p>È una moschea in uso, non un museo. Si entra scalzi, si parla piano, non si fotografano le persone che pregano. Se arrivate durante la preghiera, aspettate venti minuti nel giardino: poi si entra senza problemi.</p>
+  </div>
+</section>
+<section id="p55" class="page" data-sez="8"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i class="qui" style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">55</div>
+  <p class="sezione">Da vedere</p>
+  <h2>La chiesa sotto terra e il caravanserraglio</h2>
+  <div class="voce">
+    <div class="n">3</div>
+    <h3>Chiesa di Sveti Spas</h3>
+    <div class="dati"><b>A est del Kale</b> · metà del Cinquecento · biglietto, orari da verificare</div>
+    <div class="con-foto">
+      <p>Da fuori è un edificio basso e insignificante, con il pavimento scavato sotto il livello della strada. La spiegazione che si sente sempre è che sotto gli ottomani le chiese non potessero superare in altezza le moschee: è una tradizione molto diffusa, che però non abbiamo trovato confermata da una fonte seria. Dentro c'è la cosa più bella del bazar: una <strong>iconostasi in legno intagliato completata nel 1824</strong>, dieci metri di viti, uccelli, scene bibliche e figure in abito ottomano. Le icone del trono sono del 1867.</p>
+      <div class="foto" style="height:34mm"><img src="img/foto/b_spas.jpg" alt="Dettaglio dell'iconostasi intagliata della chiesa di Sveti Spas, con figure in abito ottomano"></div>
+    </div>
+  </div>
+  <div class="voce">
+    <div class="n">4</div>
+    <h3>Kuršumli An</h3>
+    <div class="dati"><b>Parte alta del bazar</b> · Quindicesimo-Sedicesimo secolo · cortile visitabile</div>
+    <div class="con-foto">
+      <p>Il caravanserraglio meglio conservato della città: un quadrato di stanze su due piani attorno a un cortile con la fontana. Al piano terra i magazzini e le <strong>stalle per cento cavalli</strong>, sopra le camere. Le cupole erano rivestite di <strong>piombo</strong> — <i>kurşun</i> in turco — e da lì il nome. Nell'Ottocento divenne una prigione.</p>
+      <div class="foto" style="height:34mm"><img src="img/foto/b_kursumli.jpg" alt="Il cortile porticato del Kuršumli An"></div>
+    </div>
+  </div>
+  <div class="voce spinta">
+    <div class="n">11</div>
+    <h3>Museo della Macedonia</h3>
+    <div class="dati">Accanto al Kuršumli An · chiuso il lunedì · orari da verificare</div>
+    <p>Archeologia, etnografia e storia in un unico complesso che ingloba il caravanserraglio. La sezione etnografica, con i costumi delle valli, è la parte che resta in mente.</p>
+  </div>
+</section>
+<section id="p56" class="page sx" data-sez="8"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i class="qui" style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">56</div>
+  <p class="sezione">Da vedere</p>
+  <h2>Hammam, torri e il mercato</h2>
+  <div class="voce">
+    <div class="n">7</div>
+    <h3>Hammam di Daut Pasha · Galleria Nazionale</h3>
+    <div class="dati"><b>All'imbocco del bazar</b> · bagno turco del Quindicesimo secolo · chiusa il lunedì</div>
+    <p>Un grande bagno turco del Quattrocento, oggi sede principale della <strong>Galleria Nazionale</strong>, fondata nel 1948. Sotto le cupole forate, da cui scendono fasci di luce, c'è arte macedone dal Trecento in poi. Vale anche solo per lo spazio.</p>
+  </div>
+  <div class="voce">
+    <div class="n">8</div>
+    <h3>Čifte Hammam</h3>
+    <div class="dati">Nel cuore del bazar · seconda sede della Galleria Nazionale</div>
+    <p>L'altro bagno turco, "doppio" perché aveva due ali separate per uomini e donne. Ospita mostre temporanee.</p>
+  </div>
+  <div class="voce">
+    <div class="n">9</div>
+    <h3>La torre dell'orologio</h3>
+    <div class="dati"><b>Saat Kula</b>, accanto alla moschea del sultano Murat · si guarda da fuori</div>
+    <div class="con-foto">
+      <p>Una torre in mattoni di epoca ottomana, fra le più antiche torri dell'orologio dei Balcani. Non si sale, ma è il punto di riferimento per orientarsi nella parte alta del bazar.</p>
+      <div class="foto" style="height:30mm"><img src="img/foto/b_saat.jpg" alt="La torre dell'orologio in mattoni del Vecchio Bazar"></div>
+    </div>
+  </div>
+  <div class="voce spinta">
+    <div class="n">10</div>
+    <h3>Bit Pazar</h3>
+    <div class="dati"><b>In cima al bazar</b> · mercato quotidiano, mattina · chiuso la domenica</div>
+    <div class="con-foto">
+      <p>Il mercato vero: frutta, verdura, formaggi, peperoni secchi a mazzi, sacchi di fagioli. Niente di turistico, prezzi da quartiere. <strong>È qui che si compra l'ajvar buono</strong>, quello sfuso in barattolo.</p>
+      <div class="foto" style="height:30mm"><img src="img/foto/b_bitpazar.jpg" alt="Le bancarelle di frutta e verdura del mercato Bit Pazar"></div>
+    </div>
+  </div>
+</section>
+<section id="p57" class="page" data-sez="9"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i class="qui" style="top:168mm"></i><i style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">57</div>
+  <p class="sezione">A piedi</p>
+  <h2>Dal ponte alla fortezza</h2>
+  <div class="testo">
+    <p class="lead">Due ore e mezza senza fretta, un chilometro e mezzo, tutto in leggera salita. Da fare <strong>di sabato mattina</strong>, quando le botteghe sono aperte.</p>
+  </div>
+  <ol class="tappe">
+    <li data-n="1"><b>Ponte di Pietra</b> <span class="tempo">10 min</span><br>Si attraversa da Piazza Macedonia e si entra nel bazar dalla via dei calderai.</li>
+    <li data-n="2"><b>Kazandžiska, la via dei calderai</b> <span class="tempo">20 min</span><br>Botteghe di rame battuto a mano: è il mestiere storico della via e si sente il rumore.</li>
+    <li data-n="3"><b>Čifte Hammam</b> <span class="tempo">15 min</span><br>Il bagno turco doppio, oggi galleria. Da qui si sale.</li>
+    <li data-n="4"><b>Pranzo da Destan</b> <span class="tempo">30 min</span><br>Dieci ќebapi, cipolla, pane. Contanti.</li>
+    <li data-n="5"><b>Kuršumli An</b> <span class="tempo">20 min</span><br>Il cortile del caravanserraglio, e accanto il Museo della Macedonia.</li>
+    <li data-n="6"><b>Moschea di Mustafa Pasha</b> <span class="tempo">25 min</span><br>Si sale al terrazzo: la moschea del 1492 e il giardino di rose.</li>
+    <li data-n="7"><b>Fortezza Kale</b> <span class="tempo">45 min</span><br>Ultimo tratto in salita, poi il giro dei bastioni. <strong>Da fare entro le 15</strong>.</li>
+  </ol>
+  <div class="consiglio spinta">
+    <h4>Il trucco</h4>
+    <p>Il bazar è tutto pietra lisciata da secoli di passaggio: con la pioggia diventa una pista di pattinaggio. Scarpe con la suola buona, e in discesa dal Kale prendete la strada asfaltata invece dei gradini.</p>
+  </div>
+</section>
+<section id="p58" class="page sx" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">58</div>
+  <p class="sezione">Mangiare e bere</p>
+  <h2>Si mangia qui, non in piazza</h2>
+  <div class="foto" style="height:44mm"><img src="img/foto/b_kebapi.jpg" alt="Un piatto di kebapi con patatine e cipolla"></div>
+  <p class="cap">Ќebapi: si ordinano a cinque o a dieci, con cipolla cruda e pane caldo.</p>
+  <div class="voce">
+    <div class="n m">12</div>
+    <h3>Destan <span class="prezzo">€</span></h3>
+    <div class="dati"><b>Kazandžiska 4</b> · dal <b>1913</b> · orari indicati 08:00-23:00, da confermare · contanti</div>
+    <p>Un solo piatto, fatto da più di cent'anni. Si entra, si dice il numero, arrivano i ќebapi con la cipolla e il pane. In sei si pranza con una quindicina di euro in tutto. Niente prenotazione: si aspetta cinque minuti.</p>
+  </div>
+  <div class="voce spinta">
+    <div class="n m">13</div>
+    <h3>Pivnica An <span class="prezzo">€€</span></h3>
+    <div class="dati">Dentro <b>Kapan An</b> · tel. +389 2 321 2111 · 09:00-24:00, domenica dalle 12 · si prenota</div>
+    <p>Si cena sotto le volte di un caravanserraglio, con birre locali e piatti tradizionali — tavče gravče, griglia, selsko meso. È il posto giusto per la cena di gruppo nel bazar: <strong>per sei, prenotate</strong>.</p>
+  </div>
+</section>
+<section id="p59" class="page" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">59</div>
+  <p class="sezione">Shopping</p>
+  <h2>Cosa comprare nel bazar</h2>
+  <div class="voce">
+    <div class="n s">1</div>
+    <h3>Rame battuto a mano</h3>
+    <div class="dati">Kazandžiska, la via dei calderai</div>
+    <p>Caffettiere da caffè turco (<i>džezve</i>), vassoi, bricchi. Si lavora ancora a martello nella bottega: si sente il rumore prima di vedere il negozio. Un džezve piccolo sta sui 500-800 MKD.</p>
+  </div>
+  <div class="voce">
+    <div class="n s">2</div>
+    <h3>Filigrana d'argento</h3>
+    <div class="dati">Botteghe orafe sparse nel bazar</div>
+    <p>Lavorazione tradizionale macedone a fili sottilissimi. Il prezzo si fa al peso più la fattura: chiedete sempre prima.</p>
+  </div>
+  <div class="voce">
+    <div class="n s">3</div>
+    <h3>Da mangiare, a Bit Pazar</h3>
+    <div class="dati">In cima al bazar, la mattina · chiuso la domenica</div>
+    <p>Peperoni secchi a mazzi, tè di montagna, paprika, fagioli, ajvar sfuso. <strong>Attenzione ai liquidi</strong>: ajvar e miele vanno in stiva. Le cose secche no.</p>
+  </div>
+  <div class="riquadro">
+    <h4>Lo sapevi?</h4>
+    <p>Il <strong>26 ottobre 1689</strong> il generale austriaco <strong>Piccolomini</strong> diede fuoco a Skopje: la città bruciò per due giorni e la popolazione crollò da circa sessantamila a diecimila abitanti. Il bazar perse il suo ruolo di grande piazza commerciale dei Balcani e molti abitanti finirono a Istanbul, in un quartiere che si chiamò <i>Üsküp mahallesi</i>, il quartiere di Skopje. Quello che si cammina oggi è in gran parte ricostruito dopo quell'incendio.</p>
+  </div>
+  <div class="consiglio spinta">
+    <h4>Contrattare</h4>
+    <p>Nelle botteghe di rame e argento si tratta, con calma e senza esagerare: il margine è del dieci o quindici per cento, non della metà. A Bit Pazar e nelle ќebapčilnica i prezzi sono fissi e non si discute.</p>
+  </div>
+</section>
+<section id="p60" class="page sx crediti" data-sez="10"><div class="linea" aria-hidden="true"><i style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i class="qui" style="top:187mm"></i></div><div class="testata"><span>Il Vecchio Bazar e il Kale</span><span>Zone</span></div><div class="folio">60</div><p class="sezione">Crediti fotografici</p><h2>Le foto di questo capitolo</h2><p class="piccolo">Foto da Wikimedia Commons, pubblicate con licenze Creative Commons o in pubblico dominio. Mappe: Esri, HERE, Garmin e i contributori di OpenStreetMap. Dati stradali: OpenStreetMap.</p><ul class="lista-crediti"><li><b>b_apertura</b>: Klovovi, CC BY 2.0, <span>commons.wikimedia.org/wiki/File:Skopska_Čaršija_-_Skopje_Bazaar_(7811769852).jpg</span></li><li><b>b_kale</b>: aiva., CC BY 2.0, <span>commons.wikimedia.org/wiki/File:Skopje_and_Vodno_behind_Kale_fortress_(42419812424).jpg</span></li><li><b>pi_mustafa</b>: Pudelek, CC BY-SA 3.0, <span>commons.wikimedia.org/wiki/File:Mustafa_Paşa_Mosque,_Skopje.jpg</span></li><li><b>b_bazar</b>: Nikkyb, Public domain, <span>commons.wikimedia.org/wiki/File:Skopje_OldBazaar.jpg</span></li><li><b>b_spas</b>: Sait Can Kutsal, CC BY-SA 4.0, <span>commons.wikimedia.org/wiki/File:Ottoman_figures,_Iconostasis_in_the_Church_of_Sveti_Spas,_Northern_Macedonia.jpg</span></li><li><b>b_kursumli</b>: Македонец, CC BY 3.0, <span>commons.wikimedia.org/wiki/File:Kurshumli-An-Skopje-MK.JPG</span></li><li><b>b_saat</b>: Darko Nikolovski, CC BY-SA 3.0, <span>commons.wikimedia.org/wiki/File:Saat_Kula-Sultan_Muratova_Dzamija_-Skopje_(27).JPG</span></li><li><b>b_bitpazar</b>: Prince Roy, CC BY 2.0, <span>commons.wikimedia.org/wiki/File:BP-Skopje_Market.jpg</span></li><li><b>b_kebapi</b>: Dan from Brussels, Europe, CC BY-SA 2.0, <span>commons.wikimedia.org/wiki/File:Ćevapčići_(Ћевапчићи)_in_the_Old_Bazaar,_Skopje_(Скопје)_(33972910242).jpg</span></li></ul></section>
+<script>
+// segnala le pagine troppo piene (in stampa il testo verrebbe tagliato)
+window.addEventListener('load', () => {
+  const piene = [...document.querySelectorAll('.page')].filter(p => p.scrollHeight > p.clientHeight + 2)
+    .map((p, i) => p.querySelector('.folio')?.textContent || 'apertura');
+  document.body.dataset.piene = piene.join(',');
+});
+</script>
+</body></html>
