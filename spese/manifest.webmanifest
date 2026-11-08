@@ -1,0 +1,11 @@
+{
+  "name": "Spese di Skopje",
+  "short_name": "Spese",
+  "description": "Divisione delle spese del viaggio a Skopje, 4-7 dicembre 2026",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffdf9",
+  "theme_color": "#1d2a44",
+  "lang": "it"
+}

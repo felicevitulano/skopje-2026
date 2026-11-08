@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d2a44">
+<title>Spese di Skopje</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Stessa identità della guida e della mappa: Fraunces + Figtree, carta e blu notte. */
+:root{
+  --paper:#fffdf9; --sand:#f2ebde; --card:#fff; --ink:#1d2a44; --muted:#5f6472; --line:#ddd3c0;
+  --red:#b8402f; --teal:#2f7272; --mustard:#c08a25; --navy:#26375c;
+  --teal-tint:#e6f0ee; --mustard-tint:#f7eedb; --red-tint:#f7e5e1;
+  --f-display:"Fraunces",Georgia,serif; --f-body:"Figtree",system-ui,-apple-system,sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:16px/1.5 var(--f-body);
+  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--red);outline-offset:2px;border-radius:4px}
+[hidden]{display:none!important}
+
+.wrap{max-width:720px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+
+header{background:var(--ink);color:var(--paper);padding:18px 0 16px;margin-bottom:18px}
+header .wrap{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 16px}
+header h1{font:800 26px/1 var(--f-display);margin:0;letter-spacing:-.01em}
+header small{display:block;font:600 11px/1.2 var(--f-body);letter-spacing:.16em;text-transform:uppercase;
+  opacity:.72;margin-bottom:5px}
+header .tot{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
+header .tot b{display:block;font:800 22px/1.1 var(--f-display)}
+header .tot span{font-size:11.5px;opacity:.75;letter-spacing:.04em}
+
+/* ---- schede ---- */
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1.5px solid var(--line);background:transparent;border-radius:999px;
+  padding:7px 15px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ---- blocchi ---- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+h2{font:800 19px/1.2 var(--f-display);margin:0 0 12px}
+h3{font:700 13px/1.2 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+
+/* ---- form ---- */
+label{display:block;font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:9px;padding:11px 12px;background:var(--paper)}
+input:focus,select:focus,textarea:focus{border-color:var(--ink);outline:none}
+.riga{display:grid;gap:12px;margin-bottom:13px}
+.riga.due{grid-template-columns:1fr 1fr}
+.importo{display:grid;grid-template-columns:1fr auto;gap:8px}
+.valuta{display:flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden}
+.valuta button{border:0;background:transparent;padding:0 14px;font-weight:700;cursor:pointer;color:var(--muted)}
+.valuta button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.conv{font-size:12.5px;color:var(--teal);font-weight:600;margin-top:6px;min-height:18px}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:7px 13px;
+  font-size:14px;font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.tutti{display:flex;gap:10px;margin-top:9px}
+.tutti button{border:0;background:transparent;padding:0;font-size:13px;font-weight:600;
+  color:var(--teal);text-decoration:underline;cursor:pointer}
+
+.primario{width:100%;border:0;background:var(--red);color:#fff;border-radius:10px;padding:14px;
+  font-size:16px;font-weight:700;cursor:pointer}
+.primario:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+.secondario{border:1.5px solid var(--line);background:var(--card);border-radius:9px;padding:10px 14px;
+  font-size:14px;font-weight:600;cursor:pointer}
+
+/* ---- elenco spese ---- */
+.giorno{font:700 12px/1 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  margin:18px 0 8px}
+.spesa{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.spesa:last-child{border-bottom:0}
+.spesa .n{font-weight:600}
+.spesa .cifra{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.spesa .sot{grid-column:1;font-size:13px;color:var(--muted)}
+.spesa .az{grid-column:2;display:flex;gap:10px;justify-content:flex-end}
+.spesa .az button{border:0;background:transparent;font-size:12.5px;font-weight:600;color:var(--muted);
+  cursor:pointer;text-decoration:underline;padding:0}
+.spesa .az button.canc{color:var(--red)}
+.vuoto{color:var(--muted);font-size:14.5px;text-align:center;padding:26px 10px}
+
+/* ---- riepilogo ---- */
+.saldo{display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;align-items:baseline;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.saldo:last-child{border-bottom:0}
+.saldo b{font-weight:600}
+.saldo .num{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);white-space:nowrap}
+.saldo .val{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;min-width:84px;text-align:right}
+.pos{color:var(--teal)} .neg{color:var(--red)} .zero{color:var(--muted)}
+
+.barra{height:8px;border-radius:999px;background:var(--sand);overflow:hidden;margin-top:3px;grid-column:1/-1}
+.barra i{display:block;height:100%}
+
+/* ---- dare avere ---- */
+.giro{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:13px 0;border-bottom:1px solid var(--line)}
+.giro:last-child{border-bottom:0}
+.giro .da{font-weight:700}
+.giro .fr{color:var(--muted)}
+.giro .q{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+
+.tipo-riga{display:grid;grid-template-columns:1fr auto;gap:3px 12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.tipo-riga:last-child{border-bottom:0}
+.tipo-riga .q{font-variant-numeric:tabular-nums;font-weight:700}
+
+/* ---- condividi ---- */
+.azioni{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.esito{font-size:13.5px;font-weight:600;color:var(--teal);margin-top:10px;min-height:20px}
+.avviso{background:var(--mustard-tint);border-radius:9px;padding:12px 14px;font-size:13.5px;margin-top:12px}
+.avviso b{color:#8a5f12}
+
+footer{color:var(--muted);font-size:12.5px;text-align:center;padding:26px 16px 0}
+footer a{color:var(--muted)}
+
+@media (max-width:520px){
+  .riga.due{grid-template-columns:1fr}
+  header .tot{margin-left:0;text-align:left;width:100%;margin-top:8px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1><small>Skopje · 4-7 dicembre 2026</small>Spese del viaggio</h1>
+    <div class="tot"><b id="h-tot">€ 0,00</b><span id="h-quota">quota a testa € 0,00</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-aggiungi" aria-controls="p-aggiungi" aria-selected="true">Aggiungi</button>
+    <button class="tab" role="tab" id="t-spese" aria-controls="p-spese" aria-selected="false">Spese <span id="n-spese"></span></button>
+    <button class="tab" role="tab" id="t-riepilogo" aria-controls="p-riepilogo" aria-selected="false">Riepilogo</button>
+    <button class="tab" role="tab" id="t-conti" aria-controls="p-conti" aria-selected="false">Dare–avere</button>
+    <button class="tab" role="tab" id="t-condividi" aria-controls="p-condividi" aria-selected="false">Condividi</button>
+  </div>
+
+  <!-- AGGIUNGI -->
+  <section id="p-aggiungi" role="tabpanel" aria-labelledby="t-aggiungi">
+    <form class="card" id="form">
+      <h2 id="form-titolo">Nuova spesa</h2>
+      <div class="riga">
+        <div>
+          <label for="f-importo">Importo</label>
+          <div class="importo">
+            <input id="f-importo" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0,00" required>
+            <div class="valuta" role="group" aria-label="Valuta">
+              <button type="button" id="v-eur" aria-pressed="true">€</button>
+              <button type="button" id="v-mkd" aria-pressed="false">MKD</button>
+            </div>
+          </div>
+          <p class="conv" id="f-conv"></p>
+        </div>
+      </div>
+      <div class="riga due">
+        <div>
+          <label for="f-chi">Chi ha pagato</label>
+          <select id="f-chi" required></select>
+        </div>
+        <div>
+          <label for="f-tipo">Tipologia</label>
+          <select id="f-tipo" required></select>
+        </div>
+      </div>
+      <div class="riga due">
+        <div>
+          <label for="f-data">Giorno</label>
+          <input id="f-data" type="date" required>
+        </div>
+        <div>
+          <label for="f-nota">Nota</label>
+          <input id="f-nota" type="text" placeholder="es. cena da Pivnica An" maxlength="60">
+        </div>
+      </div>
+      <div class="riga">
+        <div>
+          <label id="lab-part">Divisa fra</label>
+          <div class="chips" id="f-part" role="group" aria-labelledby="lab-part"></div>
+          <div class="tutti">
+            <button type="button" id="p-tutti">Tutti e sei</button>
+            <button type="button" id="p-nessuno">Nessuno</button>
+          </div>
+          <p class="conv" id="f-quota"></p>
+        </div>
+      </div>
+      <button class="primario" id="f-salva" type="submit">Aggiungi la spesa</button>
+      <div class="azioni" id="f-annulla-box" hidden>
+        <button type="button" class="secondario" id="f-annulla">Annulla la modifica</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- SPESE -->
+  <section id="p-spese" role="tabpanel" aria-labelledby="t-spese" hidden>
+    <div class="card">
+      <h2>Tutte le spese</h2>
+      <div class="riga due">
+        <div>
+          <label for="f-fchi">Filtra per chi ha pagato</label>
+          <select id="f-fchi"></select>
+        </div>
+        <div>
+          <label for="f-ftipo">Filtra per tipologia</label>
+          <select id="f-ftipo"></select>
+        </div>
+      </div>
+      <div id="elenco"></div>
+    </div>
+  </section>
+
+  <!-- RIEPILOGO -->
+  <section id="p-riepilogo" role="tabpanel" aria-labelledby="t-riepilogo" hidden>
+    <div class="card">
+      <h2>Chi ha anticipato cosa</h2>
+      <div id="saldi"></div>
+      <p class="hint">Anticipato = quanto ha tirato fuori di tasca. Quota = quanto gli spetta in base alle spese a cui ha partecipato. Saldo = la differenza.</p>
+    </div>
+    <div class="card">
+      <h2>Per tipologia</h2>
+      <div id="tipologie"></div>
+    </div>
+  </section>
+
+  <!-- DARE AVERE -->
+  <section id="p-conti" role="tabpanel" aria-labelledby="t-conti" hidden>
+    <div class="card">
+      <h2>Come si chiudono i conti</h2>
+      <div id="giri"></div>
+      <p class="hint" id="giri-nota"></p>
+    </div>
+  </section>
+
+  <!-- CONDIVIDI -->
+  <section id="p-condividi" role="tabpanel" aria-labelledby="t-condividi" hidden>
+    <div class="card">
+      <h2>Manda i conti agli altri</h2>
+      <p class="hint" style="margin-top:0">Il link contiene tutte le spese. Chi lo apre vede gli stessi conti e può continuare ad aggiungere. Chi aggiunge qualcosa rigenera il link e lo rimanda al gruppo.</p>
+      <div class="azioni">
+        <button class="secondario" id="b-copia">Copia il link</button>
+        <button class="secondario" id="b-whatsapp">Manda su WhatsApp</button>
+        <button class="secondario" id="b-scarica">Scarica il file</button>
+        <button class="secondario" id="b-carica">Carica un file</button>
+        <input type="file" id="f-file" accept="application/json" hidden>
+      </div>
+      <p class="esito" id="esito"></p>
+      <div class="avviso">
+        <b>Una regola sola:</b> inserisce le spese una persona alla volta. Se due aggiungono contemporaneamente da due link diversi, vince l'ultimo link condiviso e l'altro perde le sue righe.
+      </div>
+    </div>
+    <div class="card">
+      <h2>Ricomincia</h2>
+      <p class="hint" style="margin-top:0">Cancella tutte le spese da questo dispositivo e riparte da quelle precaricate.</p>
+      <div class="azioni"><button class="secondario" id="b-reset" style="color:var(--red);border-color:var(--red)">Azzera tutto</button></div>
+    </div>
+  </section>
+
+  <footer>
+    Cambio fisso <b>61,5 MKD = 1 €</b> · <a href="../">mappa del viaggio</a> · <a href="../guida/">guida</a>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ------------------------------------------------------------------ dati */
+const PERSONE = ["Ezio","Felice","Giulia","Giuseppe","Lina","Michele"];   // ordine alfabetico
+const TIPI = ["Alloggio","Trasporti","Ristoranti e bar","Spesa e souvenir","Musei e attività","Varie"];
+const COLORI_TIPO = ["#26375c","#b8402f","#2f7272","#c08a25","#6b3a5d","#5f6472"];
+const MKD_EUR = 61.5;
+const TUTTI = (1 << PERSONE.length) - 1;
+
+// Spese già fatte, precaricate. Gli importi sono in centesimi di euro.
+const PRECARICATE = [
+  { d:"2026-11-07", c:58030, mkd:null, p:PERSONE.indexOf("Felice"), t:TIPI.indexOf("Trasporti"),
+    q:TUTTI, n:"Volo A/R Bari–Skopje, Wizz Air, 6 persone" },
+  { d:"2026-11-07", c:3180, mkd:null, p:PERSONE.indexOf("Felice"), t:TIPI.indexOf("Varie"),
+    q:TUTTI, n:"eSIM Holafly" }
+];
+
+let spese = [];        // {id, d, c, mkd, p, t, q, n}
+let modificaId = null;
+let valuta = "EUR";
+
+/* ------------------------------------------------------- utilità di base */
+const $ = s => document.querySelector(s);
+const el = (tag, cls, txt) => { const x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; };
+const eur = c => (c/100).toLocaleString("it-IT",{style:"currency",currency:"EUR"});
+const mkd = n => Math.round(n).toLocaleString("it-IT") + " MKD";
+const bit = i => 1 << i;
+const conta = q => PERSONE.reduce((n,_,i) => n + (q & bit(i) ? 1 : 0), 0);
+const nomi = q => PERSONE.filter((_,i) => q & bit(i));
+const giornoLungo = d => new Date(d + "T12:00:00")
+  .toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
+
+/* --------------------------------------------------- stato: salva e carica */
+// Formato compatto per il link: [giorni dal 2026-11-01, centesimi, mkd|0, pagante, tipo, maschera, nota]
+const GIORNO0 = Date.UTC(2026,10,1);
+const aGiorni = d => Math.round((Date.parse(d + "T00:00:00Z") - GIORNO0) / 86400000);
+const daGiorni = n => new Date(GIORNO0 + n*86400000).toISOString().slice(0,10);
+
+const comprimi = () => JSON.stringify({ v:1, s: spese.map(x => [aGiorni(x.d), x.c, x.mkd || 0, x.p, x.t, x.q, x.n || ""]) });
+function decomprimi(txt){
+  const o = JSON.parse(txt);
+  if (!o || !Array.isArray(o.s)) throw new Error("formato non riconosciuto");
+  return o.s.map((a,i) => ({ id:"s"+i+"_"+Math.random().toString(36).slice(2,7),
+    d:daGiorni(a[0]), c:a[1], mkd:a[2] || null, p:a[3], t:a[4], q:a[5], n:a[6] || "" }));
+}
+
+const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const unb64 = s => decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))));
+
+function salvaLocale(){ try { localStorage.setItem("spese-skopje", comprimi()); } catch(e){} }
+function caricaLocale(){
+  try { const t = localStorage.getItem("spese-skopje"); return t ? decomprimi(t) : null; } catch(e){ return null; }
+}
+function nuoveId(){ return "s" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* ------------------------------------------------------------- calcoli */
+function totale(){ return spese.reduce((n,s) => n + s.c, 0); }
+
+// Quanto ha anticipato ciascuno e quanto gli spetta. Tutto in centesimi, senza perdere resti.
+function saldi(){
+  const anticipato = PERSONE.map(() => 0);
+  const quota = PERSONE.map(() => 0);
+  for (const s of spese){
+    anticipato[s.p] += s.c;
+    const n = conta(s.q);
+    if (!n) continue;
+    const base = Math.floor(s.c / n);
+    let resto = s.c - base * n;            // i centesimi avanzati vanno ai primi, in ordine alfabetico
+    PERSONE.forEach((_,i) => {
+      if (!(s.q & bit(i))) return;
+      quota[i] += base + (resto > 0 ? 1 : 0);
+      if (resto > 0) resto--;
+    });
+  }
+  return PERSONE.map((nome,i) => ({ nome, anticipato:anticipato[i], quota:quota[i], saldo:anticipato[i] - quota[i] }));
+}
+
+// Numero minimo di bonifici: si accoppia sempre il debitore più grosso con il creditore più grosso.
+function chiusura(){
+  const debiti = [], crediti = [];
+  for (const s of saldi()){
+    if (s.saldo < -0) debiti.push({ nome:s.nome, q:-s.saldo });
+    else if (s.saldo > 0) crediti.push({ nome:s.nome, q:s.saldo });
+  }
+  debiti.sort((a,b) => b.q - a.q); crediti.sort((a,b) => b.q - a.q);
+  const giri = [];
+  let i = 0, j = 0;
+  while (i < debiti.length && j < crediti.length){
+    const q = Math.min(debiti[i].q, crediti[j].q);
+    if (q > 0) giri.push({ da:debiti[i].nome, a:crediti[j].nome, q });
+    debiti[i].q -= q; crediti[j].q -= q;
+    if (debiti[i].q === 0) i++;
+    if (crediti[j].q === 0) j++;
+  }
+  return giri;
+}
+
+/* --------------------------------------------------------- costruzione UI */
+function riempiSelect(sel, voci, conTutti, etichettaTutti){
+  sel.replaceChildren();
+  if (conTutti) sel.append(new Option(etichettaTutti, ""));
+  voci.forEach((v,i) => sel.append(new Option(v, String(i))));
+}
+
+function costruisciForm(){
+  riempiSelect($("#f-chi"), PERSONE, false);
+  riempiSelect($("#f-tipo"), TIPI, false);
+  riempiSelect($("#f-fchi"), PERSONE, true, "Tutti");
+  riempiSelect($("#f-ftipo"), TIPI, true, "Tutte");
+  const box = $("#f-part"); box.replaceChildren();
+  PERSONE.forEach((nome,i) => {
+    const b = el("button","chip",nome);
+    b.type = "button"; b.dataset.i = String(i); b.setAttribute("aria-pressed","true");
+    b.onclick = () => { b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); aggiornaQuotaForm(); };
+    box.append(b);
+  });
+  $("#f-data").value = "2026-12-04";
+}
+
+const maschera = () => [...$("#f-part").querySelectorAll(".chip")]
+  .reduce((m,b) => m | (b.getAttribute("aria-pressed") === "true" ? bit(+b.dataset.i) : 0), 0);
+function impostaMaschera(q){
+  $("#f-part").querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", (q & bit(+b.dataset.i)) ? "true" : "false"));
+  aggiornaQuotaForm();
+}
+
+function centesimiDalForm(){
+  const v = parseFloat(String($("#f-importo").value).replace(",","."));
+  if (!isFinite(v) || v <= 0) return null;
+  return valuta === "EUR" ? Math.round(v * 100) : Math.round(v / MKD_EUR * 100);
+}
+
+function aggiornaQuotaForm(){
+  const c = centesimiDalForm(), n = conta(maschera());
+  $("#f-conv").textContent = c == null ? "" :
+    (valuta === "EUR" ? "pari a " + mkd(c/100*MKD_EUR) : "pari a " + eur(c));
+  $("#f-quota").textContent = (c == null || !n) ? (n ? "" : "Scegli almeno una persona.")
+    : `${n} ${n === 1 ? "persona" : "persone"} · ${eur(Math.round(c/n))} a testa`;
+  $("#f-salva").disabled = (c == null || !n);
+}
+
+/* ------------------------------------------------------------- rendering */
+function disegna(){
+  const tot = totale();
+  $("#h-tot").textContent = eur(tot);
+  $("#h-quota").textContent = "quota a testa " + eur(Math.round(tot / PERSONE.length));
+  $("#n-spese").textContent = spese.length ? "· " + spese.length : "";
+  disegnaElenco(); disegnaRiepilogo(); disegnaConti();
+  salvaLocale();
+}
+
+function disegnaElenco(){
+  const box = $("#elenco"); box.replaceChildren();
+  const fc = $("#f-fchi").value, ft = $("#f-ftipo").value;
+  const vis = spese.filter(s => (fc === "" || s.p === +fc) && (ft === "" || s.t === +ft))
+                   .sort((a,b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+  if (!vis.length){
+    box.append(el("p","vuoto", spese.length ? "Nessuna spesa con questi filtri."
+      : "Ancora nessuna spesa. Aggiungine una dalla scheda “Aggiungi”."));
+    return;
+  }
+  let giornoCorrente = null;
+  for (const s of vis){
+    if (s.d !== giornoCorrente){ giornoCorrente = s.d; box.append(el("p","giorno", giornoLungo(s.d))); }
+    const r = el("div","spesa");
+    const n = el("div","n", s.n || TIPI[s.t]);
+    const cifra = el("div","cifra", eur(s.c));
+    const q = conta(s.q);
+    const dett = `${TIPI[s.t]} · pagato da ${PERSONE[s.p]} · diviso fra ${q === PERSONE.length ? "tutti e sei" : nomi(s.q).join(", ")}`
+      + (s.mkd ? ` · ${mkd(s.mkd)}` : "");
+    const sot = el("div","sot", dett);
+    const az = el("div","az");
+    const mod = el("button",null,"modifica"); mod.onclick = () => iniziaModifica(s.id);
+    const can = el("button","canc","elimina"); can.onclick = () => elimina(s.id);
+    az.append(mod, can);
+    r.append(n, cifra, sot, az);
+    box.append(r);
+  }
+}
+
+function disegnaRiepilogo(){
+  const box = $("#saldi"); box.replaceChildren();
+  const max = Math.max(1, ...saldi().map(s => Math.max(s.anticipato, s.quota)));
+  for (const s of saldi()){
+    const r = el("div","saldo");
+    r.append(el("b",null,s.nome));
+    r.append(el("span","num", `anticipato ${eur(s.anticipato)} · quota ${eur(s.quota)}`));
+    const v = el("span","val " + (s.saldo > 0 ? "pos" : s.saldo < 0 ? "neg" : "zero"),
+      (s.saldo > 0 ? "+" : "") + eur(s.saldo));
+    r.append(v);
+    const barra = el("div","barra");
+    const i = el("i"); i.style.width = Math.round(s.anticipato / max * 100) + "%";
+    i.style.background = s.saldo >= 0 ? "var(--teal)" : "var(--red)";
+    barra.append(i); r.append(barra);
+    box.append(r);
+  }
+  const t = $("#tipologie"); t.replaceChildren();
+  const per = TIPI.map(() => 0);
+  for (const s of spese) per[s.t] += s.c;
+  const tot = totale() || 1;
+  TIPI.forEach((nome,i) => {
+    if (!per[i]) return;
+    const r = el("div","tipo-riga");
+    r.append(el("span",null,nome));
+    r.append(el("span","q", eur(per[i])));
+    const barra = el("div","barra");
+    const b = el("i"); b.style.width = Math.round(per[i]/tot*100) + "%"; b.style.background = COLORI_TIPO[i];
+    barra.append(b); r.append(barra);
+    t.append(r);
+  });
+  if (!spese.length) t.append(el("p","vuoto","Nessuna spesa."));
+}
+
+function disegnaConti(){
+  const box = $("#giri"); box.replaceChildren();
+  const giri = chiusura();
+  if (!giri.length){
+    box.append(el("p","vuoto", spese.length ? "I conti sono già pari: nessuno deve niente a nessuno."
+      : "Aggiungi qualche spesa e qui comparirà chi deve dare quanto a chi."));
+    $("#giri-nota").textContent = "";
+    return;
+  }
+  for (const g of giri){
+    const r = el("div","giro");
+    r.append(el("span","da", g.da));
+    r.append(el("span","fr","dà a"));
+    r.append(el("span","da", g.a));
+    r.append(el("span","q", eur(g.q)));
+    box.append(r);
+  }
+  $("#giri-nota").textContent = `${giri.length} ${giri.length === 1 ? "passaggio chiude" : "passaggi chiudono"} tutti i conti.`;
+}
+
+/* ------------------------------------------------------------- azioni */
+function iniziaModifica(id){
+  const s = spese.find(x => x.id === id); if (!s) return;
+  modificaId = id;
+  valuta = s.mkd ? "MKD" : "EUR"; aggiornaValuta();
+  $("#f-importo").value = s.mkd ? s.mkd : (s.c/100).toFixed(2);
+  $("#f-chi").value = String(s.p);
+  $("#f-tipo").value = String(s.t);
+  $("#f-data").value = s.d;
+  $("#f-nota").value = s.n || "";
+  impostaMaschera(s.q);
+  $("#form-titolo").textContent = "Modifica la spesa";
+  $("#f-salva").textContent = "Salva le modifiche";
+  $("#f-annulla-box").hidden = false;
+  mostra("aggiungi");
+  $("#f-importo").focus();
+}
+function fineModifica(){
+  modificaId = null;
+  $("#form").reset();
+  valuta = "EUR"; aggiornaValuta();
+  $("#f-data").value = "2026-12-04";
+  impostaMaschera(TUTTI);
+  $("#form-titolo").textContent = "Nuova spesa";
+  $("#f-salva").textContent = "Aggiungi la spesa";
+  $("#f-annulla-box").hidden = true;
+  aggiornaQuotaForm();
+}
+function elimina(id){
+  const s = spese.find(x => x.id === id); if (!s) return;
+  if (!confirm(`Eliminare “${s.n || TIPI[s.t]}” da ${eur(s.c)}?`)) return;
+  spese = spese.filter(x => x.id !== id);
+  if (modificaId === id) fineModifica();
+  disegna();
+}
+
+function aggiornaValuta(){
+  $("#v-eur").setAttribute("aria-pressed", String(valuta === "EUR"));
+  $("#v-mkd").setAttribute("aria-pressed", String(valuta === "MKD"));
+  $("#f-importo").setAttribute("step", valuta === "EUR" ? "0.01" : "1");
+  aggiornaQuotaForm();
+}
+
+/* ------------------------------------------------------------- schede */
+const PANNELLI = ["aggiungi","spese","riepilogo","conti","condividi"];
+function mostra(nome){
+  for (const p of PANNELLI){
+    $("#p-"+p).hidden = p !== nome;
+    $("#t-"+p).setAttribute("aria-selected", String(p === nome));
+  }
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* ------------------------------------------------------------- condividi */
+function link(){
+  const base = location.origin + location.pathname;
+  return base + "#d=" + b64(comprimi());
+}
+async function copiaLink(){
+  const l = link();
+  try { await navigator.clipboard.writeText(l); esito("Link copiato: incollalo nel gruppo."); }
+  catch(e){ prompt("Copia questo link e mandalo al gruppo:", l); }
+}
+function esito(t){ $("#esito").textContent = t; setTimeout(() => { if ($("#esito").textContent === t) $("#esito").textContent = ""; }, 6000); }
+
+/* ------------------------------------------------------------- avvio */
+function avvia(){
+  costruisciForm();
+  let caricate = null, origine = "";
+  const h = location.hash;
+  // Un link già aperto non va riletto: altrimenti, ricaricando la pagina, le spese aggiunte
+  // dopo l'apertura verrebbero buttate e si tornerebbe allo stato del link.
+  const giaAperto = (() => { try { return localStorage.getItem("spese-skopje-link"); } catch(e){ return null; } })();
+  if (h.startsWith("#d=") && h !== giaAperto){
+    try {
+      caricate = decomprimi(unb64(h.slice(3)));
+      origine = "link";
+      try { localStorage.setItem("spese-skopje-link", h); } catch(e){}
+    } catch(e){ alert("Il link delle spese non è leggibile: riparto da quelle salvate su questo dispositivo."); }
+  }
+  if (!caricate){ caricate = caricaLocale(); origine = caricate ? "dispositivo" : ""; }
+  if (!caricate) caricate = PRECARICATE.map(s => ({ ...s, id:nuoveId() }));
+  spese = caricate;
+  if (origine === "link"){
+    salvaLocale();                                        // subito al sicuro sul dispositivo
+    try { history.replaceState(null, "", location.pathname); } catch(e){}   // via i dati dall'indirizzo
+    esito("Spese caricate dal link.");
+  }
+  impostaMaschera(TUTTI);
+  aggiornaValuta();
+  disegna();
+
+  // schede
+  PANNELLI.forEach(p => $("#t-"+p).onclick = () => mostra(p));
+
+  // form
+  $("#v-eur").onclick = () => { valuta = "EUR"; aggiornaValuta(); };
+  $("#v-mkd").onclick = () => { valuta = "MKD"; aggiornaValuta(); };
+  $("#f-importo").oninput = aggiornaQuotaForm;
+  $("#p-tutti").onclick = () => impostaMaschera(TUTTI);
+  $("#p-nessuno").onclick = () => impostaMaschera(0);
+  $("#f-annulla").onclick = fineModifica;
+  $("#f-fchi").onchange = disegnaElenco;
+  $("#f-ftipo").onchange = disegnaElenco;
+
+  $("#form").onsubmit = e => {
+    e.preventDefault();
+    const c = centesimiDalForm(), q = maschera();
+    if (c == null || !q) return;
+    const grezzo = parseFloat(String($("#f-importo").value).replace(",","."));
+    const dati = { d:$("#f-data").value, c, mkd: valuta === "MKD" ? grezzo : null,
+      p:+$("#f-chi").value, t:+$("#f-tipo").value, q, n:$("#f-nota").value.trim() };
+    if (modificaId){ Object.assign(spese.find(x => x.id === modificaId), dati); fineModifica(); esito("Spesa aggiornata."); }
+    else { spese.push({ id:nuoveId(), ...dati }); fineModifica(); esito("Spesa aggiunta."); }
+    disegna();
+    mostra("spese");
+  };
+
+  // condividi
+  $("#b-copia").onclick = copiaLink;
+  $("#b-whatsapp").onclick = () => {
+    const t = `Spese di Skopje — totale ${eur(totale())}, ${spese.length} voci.\n${link()}`;
+    window.open("https://wa.me/?text=" + encodeURIComponent(t), "_blank", "noopener");
+  };
+  $("#b-scarica").onclick = () => {
+    const b = new Blob([comprimi()], { type:"application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(b); a.download = "spese-skopje.json"; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    esito("File scaricato.");
+  };
+  $("#b-carica").onclick = () => $("#f-file").click();
+  $("#f-file").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { spese = decomprimi(await f.text()); disegna(); esito("Spese caricate dal file."); }
+    catch(err){ alert("Il file non è leggibile."); }
+    e.target.value = "";
+  };
+  $("#b-reset").onclick = () => {
+    if (!confirm("Cancellare tutte le spese da questo dispositivo?")) return;
+    try { localStorage.removeItem("spese-skopje-link"); } catch(e){}
+    spese = PRECARICATE.map(s => ({ ...s, id:nuoveId() }));
+    fineModifica(); disegna(); esito("Azzerato.");
+  };
+
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+avvia();
+</script>
+</body>
+</html>
