@@ -169,10 +169,13 @@ p{ margin:0 }
 .appunti .righe{flex:1;background:repeating-linear-gradient(transparent 0 7.4mm, #e2dacb 7.4mm 7.65mm)}
 
 .barra-web{display:none}
-@media screen{.barra-web{display:flex;gap:18px;justify-content:center;position:sticky;top:0;z-index:10;
-  padding:10px 16px;background:#1d2a44;font:600 14px var(--f-body)}.barra-web a{color:#fff;text-decoration:none}}
+@media screen{.barra-web{display:flex;gap:6px;justify-content:center;align-items:center;position:sticky;top:0;z-index:10;
+  padding:9px 12px;background:#1d2a44;font:600 14px var(--f-body)}
+.barra-web a{color:#fff;text-decoration:none;opacity:.72;padding:5px 11px;border-radius:999px}
+.barra-web a[aria-current]{opacity:1;background:rgba(255,255,255,.17)}
+.barra-web a.pdf{opacity:1;background:#b8402f;font-size:12.5px;letter-spacing:.05em}}
 @media print{.barra-web{display:none}}
-</style></head><body><nav class="barra-web"><a href="./">← Guida</a><a href="Guida-Skopje-leggera.pdf">Tutta la guida in PDF</a><a href="../">Mappa</a></nav>
+</style></head><body><nav class="barra-web"><a href="../">Mappa</a><a href="./" aria-current="page">Guida</a><a href="../spese/">Spese</a><a class="pdf" href="Guida-Skopje-leggera.pdf">PDF</a></nav>
 <section id="p21" class="page apertura" data-sez="1" data-nohead><div class="linea" aria-hidden="true"><i class="qui" style="top:16mm"></i><i style="top:35mm"></i><i style="top:54mm"></i><i style="top:73mm"></i><i style="top:92mm"></i><i style="top:111mm"></i><i style="top:130mm"></i><i style="top:149mm"></i><i style="top:168mm"></i><i style="top:187mm"></i></div>
   <img style="object-position:50% 60%" src="img/foto/pr_vardar.jpg" alt="Il Vardar innevato a Skopje fra il giorno e la notte">
   <div class="velo"></div>
