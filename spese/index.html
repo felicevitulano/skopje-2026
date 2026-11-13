@@ -42,6 +42,13 @@ header small{display:block;font:600 11px/1.2 var(--f-body);letter-spacing:.16em;
 header .tot{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
 header .tot b{display:block;font:800 22px/1.1 var(--f-display)}
 header .tot span{font-size:11.5px;opacity:.75;letter-spacing:.04em}
+.sync{flex-basis:100%;margin:8px 0 0;font-size:12px;font-weight:600;letter-spacing:.04em;
+  display:flex;align-items:center;gap:7px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.sync[data-stato="ok"]{color:#8fd3c4}
+.sync[data-stato="attesa"]{color:#e6d79a}
+.sync[data-stato="errore"]{color:#f0a68f}
+.sync[data-stato="locale"]{color:#f0a68f}
 
 /* ---- schede ---- */
 .tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding-bottom:2px}
@@ -146,6 +153,7 @@ footer a{color:var(--muted)}
   <div class="wrap">
     <h1><small>Skopje · 4-7 dicembre 2026</small>Spese del viaggio</h1>
     <div class="tot"><b id="h-tot">€ 0,00</b><span id="h-quota">quota a testa € 0,00</span></div>
+    <p class="sync" id="sync" data-stato="locale">solo questo dispositivo</p>
   </div>
 </header>
 
@@ -299,7 +307,18 @@ const PRECARICATE = [
     q:TUTTI, n:"eSIM Holafly" }
 ];
 
-let spese = [];        // {id, d, c, mkd, p, t, q, n}
+// Database condiviso (Firestore via API REST, senza SDK: niente da scaricare, funziona anche
+// se la rete cade). Finché PROGETTO è vuoto l'app lavora solo in locale, come prima.
+const NUVOLA = {
+  PROGETTO: "",        // id del progetto Firebase
+  CHIAVE: "",          // apiKey del progetto (è pubblica per definizione nelle app web)
+  DOCUMENTO: "skopje-2026",
+};
+const attiva = () => !!(NUVOLA.PROGETTO && NUVOLA.CHIAVE);
+
+let spese = [];        // {id, d, c, mkd, p, t, q, n, m}  m = quando è stata modificata
+let cancellate = {};   // {id: quando} — serve per propagare le eliminazioni agli altri telefoni
+let ultimaSync = 0, statoSync = "locale";
 let modificaId = null;
 let valuta = "EUR";
 
@@ -315,17 +334,43 @@ const giornoLungo = d => new Date(d + "T12:00:00")
   .toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long"});
 
 /* --------------------------------------------------- stato: salva e carica */
-// Formato compatto per il link: [giorni dal 2026-11-01, centesimi, mkd|0, pagante, tipo, maschera, nota]
+// Formato compatto per link e database: [id, giorni dal 2026-11-01, centesimi, mkd|0, pagante,
+// tipo, maschera, nota, modificata]. L'id viaggia con la spesa: senza, due telefoni non possono
+// capire che stanno parlando della stessa riga.
 const GIORNO0 = Date.UTC(2026,10,1);
 const aGiorni = d => Math.round((Date.parse(d + "T00:00:00Z") - GIORNO0) / 86400000);
 const daGiorni = n => new Date(GIORNO0 + n*86400000).toISOString().slice(0,10);
 
-const comprimi = () => JSON.stringify({ v:1, s: spese.map(x => [aGiorni(x.d), x.c, x.mkd || 0, x.p, x.t, x.q, x.n || ""]) });
+const comprimi = () => JSON.stringify({ v:2,
+  s: spese.map(x => [x.id, aGiorni(x.d), x.c, x.mkd || 0, x.p, x.t, x.q, x.n || "", x.m || 0]),
+  x: cancellate });
+
 function decomprimi(txt){
   const o = JSON.parse(txt);
   if (!o || !Array.isArray(o.s)) throw new Error("formato non riconosciuto");
-  return o.s.map((a,i) => ({ id:"s"+i+"_"+Math.random().toString(36).slice(2,7),
-    d:daGiorni(a[0]), c:a[1], mkd:a[2] || null, p:a[3], t:a[4], q:a[5], n:a[6] || "" }));
+  if (o.v === 2) return {
+    spese: o.s.map(a => ({ id:a[0], d:daGiorni(a[1]), c:a[2], mkd:a[3] || null,
+                           p:a[4], t:a[5], q:a[6], n:a[7] || "", m:a[8] || 0 })),
+    cancellate: o.x || {} };
+  // formato vecchio, senza id: se ne assegnano di nuovi una volta sola
+  return { spese: o.s.map((a,i) => ({ id:"v1_"+i+"_"+Math.random().toString(36).slice(2,7),
+      d:daGiorni(a[0]), c:a[1], mkd:a[2] || null, p:a[3], t:a[4], q:a[5], n:a[6] || "", m:0 })),
+    cancellate: {} };
+}
+
+// Fonde due elenchi: per ogni spesa vince la versione modificata più di recente,
+// e un'eliminazione cancella le versioni più vecchie di lei. Così due persone possono
+// inserire nello stesso momento senza che nessuna delle due perda la sua riga.
+function fondi(a, b){
+  const morte = { ...a.cancellate, ...b.cancellate };
+  for (const id in a.cancellate) morte[id] = Math.max(a.cancellate[id], b.cancellate[id] || 0);
+  const per = new Map();
+  for (const s of [...a.spese, ...b.spese]){
+    const c = per.get(s.id);
+    if (!c || (s.m || 0) > (c.m || 0)) per.set(s.id, s);
+  }
+  const vive = [...per.values()].filter(s => !(morte[s.id] >= (s.m || 0)));
+  return { spese: vive, cancellate: morte };
 }
 
 const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
@@ -336,6 +381,74 @@ function caricaLocale(){
   try { const t = localStorage.getItem("spese-skopje"); return t ? decomprimi(t) : null; } catch(e){ return null; }
 }
 function nuoveId(){ return "s" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* ------------------------------------------------- database condiviso */
+// Firestore via REST: un solo documento con dentro tutto. Niente SDK da scaricare,
+// quindi se la rete manca l'app continua a funzionare in locale e risincronizza dopo.
+const urlDoc = () => `https://firestore.googleapis.com/v1/projects/${NUVOLA.PROGETTO}`
+  + `/databases/(default)/documents/viaggi/${NUVOLA.DOCUMENTO}?key=${NUVOLA.CHIAVE}`;
+
+function statoNuvola(stato, quando){
+  statoSync = stato;
+  const el = $("#sync"); if (!el) return;
+  const testi = { locale:"solo questo dispositivo", attesa:"sincronizzo…",
+                  ok:"sincronizzato", errore:"offline, riprovo" };
+  el.textContent = testi[stato] + (stato === "ok" && quando ? " · " + quando : "");
+  el.dataset.stato = stato;
+}
+
+async function leggiNuvola(){
+  const r = await fetch(urlDoc(), { cache:"no-store" });
+  if (r.status === 404) return { spese: [], cancellate: {} };     // documento non ancora creato
+  if (!r.ok) throw new Error("lettura fallita: " + r.status);
+  const d = await r.json();
+  const testo = d.fields && d.fields.dati && d.fields.dati.stringValue;
+  return testo ? decomprimi(testo) : { spese: [], cancellate: {} };
+}
+
+async function scriviNuvola(){
+  const r = await fetch(urlDoc(), { method:"PATCH",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ fields: {
+      dati: { stringValue: comprimi() },
+      aggiornato: { stringValue: new Date().toISOString() } } }) });
+  if (!r.ok) throw new Error("scrittura fallita: " + r.status);
+}
+
+let syncInCorso = false, daScrivere = false;
+async function sincronizza(forzaScrittura){
+  if (!attiva() || syncInCorso) { if (forzaScrittura) daScrivere = true; return; }
+  syncInCorso = true;
+  if (statoSync !== "ok") statoNuvola("attesa");
+  try {
+    const remoto = await leggiNuvola();
+    const prima = comprimi();
+    const unito = fondi({ spese, cancellate }, remoto);
+    spese = unito.spese; cancellate = unito.cancellate;
+    const dopo = comprimi();
+    if (dopo !== prima) { disegnaTutto(); }
+    // si riscrive solo se il nostro stato aggiunge qualcosa a quello remoto
+    const soloRemoto = JSON.stringify({ v:2,
+      s: remoto.spese.map(x => [x.id, aGiorni(x.d), x.c, x.mkd || 0, x.p, x.t, x.q, x.n || "", x.m || 0]),
+      x: remoto.cancellate });
+    if (forzaScrittura || dopo !== soloRemoto) await scriviNuvola();
+    ultimaSync = Date.now();
+    statoNuvola("ok", new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}));
+  } catch(e){
+    statoNuvola("errore");
+  } finally {
+    syncInCorso = false;
+    if (daScrivere){ daScrivere = false; setTimeout(() => sincronizza(true), 400); }
+  }
+}
+
+let attesaScrittura;
+function cambiato(){            // chiamata a ogni modifica: salva subito, sincronizza dopo un attimo
+  salvaLocale();
+  if (!attiva()) return;
+  clearTimeout(attesaScrittura);
+  attesaScrittura = setTimeout(() => sincronizza(true), 800);
+}
 
 /* ------------------------------------------------------------- calcoli */
 function totale(){ return spese.reduce((n,s) => n + s.c, 0); }
@@ -424,14 +537,14 @@ function aggiornaQuotaForm(){
 }
 
 /* ------------------------------------------------------------- rendering */
-function disegna(){
+function disegnaTutto(){
   const tot = totale();
   $("#h-tot").textContent = eur(tot);
   $("#h-quota").textContent = "quota a testa " + eur(Math.round(tot / PERSONE.length));
   $("#n-spese").textContent = spese.length ? "· " + spese.length : "";
   disegnaElenco(); disegnaRiepilogo(); disegnaConti();
-  salvaLocale();
 }
+function disegna(){ disegnaTutto(); cambiato(); }
 
 function disegnaElenco(){
   const box = $("#elenco"); box.replaceChildren();
@@ -547,6 +660,7 @@ function elimina(id){
   const s = spese.find(x => x.id === id); if (!s) return;
   if (!confirm(`Eliminare “${s.n || TIPI[s.t]}” da ${eur(s.c)}?`)) return;
   spese = spese.filter(x => x.id !== id);
+  cancellate[id] = Date.now();        // lapide: dice agli altri telefoni che va tolta anche da loro
   if (modificaId === id) fineModifica();
   disegna();
 }
@@ -596,8 +710,14 @@ function avvia(){
     } catch(e){ alert("Il link delle spese non è leggibile: riparto da quelle salvate su questo dispositivo."); }
   }
   if (!caricate){ caricate = caricaLocale(); origine = caricate ? "dispositivo" : ""; }
-  if (!caricate) caricate = PRECARICATE.map(s => ({ ...s, id:nuoveId() }));
-  spese = caricate;
+  // un link si fonde con quello che c'è già sul dispositivo, non lo sostituisce:
+  // chi apre il link del gruppo non perde le spese che aveva segnato prima
+  if (origine === "link"){
+    const mio = caricaLocale();
+    if (mio) caricate = fondi(mio, caricate);
+  }
+  if (!caricate) caricate = { spese: PRECARICATE.map(s => ({ ...s, id:nuoveId(), m:Date.now() })), cancellate:{} };
+  spese = caricate.spese; cancellate = caricate.cancellate || {};
   if (origine === "link"){
     salvaLocale();                                        // subito al sicuro sul dispositivo
     try { history.replaceState(null, "", location.pathname); } catch(e){}   // via i dati dall'indirizzo
@@ -627,6 +747,7 @@ function avvia(){
     const grezzo = parseFloat(String($("#f-importo").value).replace(",","."));
     const dati = { d:$("#f-data").value, c, mkd: valuta === "MKD" ? grezzo : null,
       p:+$("#f-chi").value, t:+$("#f-tipo").value, q, n:$("#f-nota").value.trim() };
+    dati.m = Date.now();
     if (modificaId){ Object.assign(spese.find(x => x.id === modificaId), dati); fineModifica(); esito("Spesa aggiornata."); }
     else { spese.push({ id:nuoveId(), ...dati }); fineModifica(); esito("Spesa aggiunta."); }
     disegna();
@@ -649,16 +770,29 @@ function avvia(){
   $("#b-carica").onclick = () => $("#f-file").click();
   $("#f-file").onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
-    try { spese = decomprimi(await f.text()); disegna(); esito("Spese caricate dal file."); }
+    try { const d = fondi({ spese, cancellate }, decomprimi(await f.text()));
+          spese = d.spese; cancellate = d.cancellate; disegna(); esito("Spese unite a quelle del file."); }
     catch(err){ alert("Il file non è leggibile."); }
     e.target.value = "";
   };
   $("#b-reset").onclick = () => {
     if (!confirm("Cancellare tutte le spese da questo dispositivo?")) return;
     try { localStorage.removeItem("spese-skopje-link"); } catch(e){}
-    spese = PRECARICATE.map(s => ({ ...s, id:nuoveId() }));
+    for (const x of spese) cancellate[x.id] = Date.now();   // così sparisce anche dagli altri telefoni
+    spese = PRECARICATE.map(s => ({ ...s, id:nuoveId(), m:Date.now() }));
     fineModifica(); disegna(); esito("Azzerato.");
   };
+
+  // database condiviso: prima lettura, poi un controllo ogni 15 secondi mentre la pagina è in primo
+  // piano, e uno al rientro sull'app. Se non è configurato resta tutto in locale.
+  if (attiva()){
+    sincronizza(false);
+    setInterval(() => { if (!document.hidden) sincronizza(false); }, 15000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) sincronizza(false); });
+    window.addEventListener("online", () => sincronizza(false));
+  } else {
+    statoNuvola("locale");
+  }
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 }
