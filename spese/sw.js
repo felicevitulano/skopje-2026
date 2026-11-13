@@ -1,7 +1,7 @@
 // Service worker minimo: tiene l'app disponibile anche senza rete.
 // A Skopje il roaming europeo non vale, quindi l'app deve funzionare offline.
 // Quando cambia l'app si alza VERSIONE e le cache vecchie vengono buttate.
-const VERSIONE = "spese-skopje-v5";
+const VERSIONE = "spese-skopje-v6";
 const FILE = ["./", "./index.html", "./manifest.webmanifest"];
 
 self.addEventListener("install", e => {

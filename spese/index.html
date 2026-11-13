@@ -374,7 +374,23 @@ function fondi(a, b){
     if (!c || (s.m || 0) > (c.m || 0)) per.set(s.id, s);
   }
   const vive = [...per.values()].filter(s => !(morte[s.id] >= (s.m || 0)));
-  return { spese: vive, cancellate: morte };
+  return ripara({ spese: vive, cancellate: morte });
+}
+
+// Un telefono con la versione vecchia dell'app in cache ricrea le spese precaricate con un
+// identificativo casuale e le manda nel database: comparirebbero due volte a tutti. Qui si
+// riconoscono dal nome e dall'importo, si tolgono e si marcano come eliminate, così spariscono
+// anche dagli altri telefoni. Vale solo per le due righe precaricate, non per le spese vere.
+function ripara(st){
+  for (const base of PRECARICATE){
+    const doppioni = st.spese.filter(s => s.id !== base.id && s.n === base.n && s.c === base.c);
+    if (!doppioni.length) continue;
+    st.spese = st.spese.filter(s => !doppioni.includes(s));
+    for (const d of doppioni) st.cancellate[d.id] = Math.max(st.cancellate[d.id] || 0, Date.now());
+    const eliminataDavvero = st.cancellate[base.id] >= base.m;
+    if (!st.spese.some(s => s.id === base.id) && !eliminataDavvero) st.spese.push({ ...base });
+  }
+  return st;
 }
 
 const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
