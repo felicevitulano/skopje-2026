@@ -300,21 +300,25 @@ const MKD_EUR = 61.5;
 const TUTTI = (1 << PERSONE.length) - 1;
 
 // Spese già fatte, precaricate. Gli importi sono in centesimi di euro.
+// Gli identificativi sono FISSI e la data di modifica è nel passato: così un telefono nuovo
+// che le ricrea produce le stesse righe, la fusione le riconosce e non le duplica; e se qualcuno
+// le cancella, l'eliminazione (più recente) vince e non tornano indietro.
+const PRIMA = Date.parse("2026-11-07T00:00:00Z");
 const PRECARICATE = [
-  { d:"2026-11-07", c:58030, mkd:null, p:PERSONE.indexOf("Felice"), t:TIPI.indexOf("Trasporti"),
-    q:TUTTI, n:"Volo A/R Bari–Skopje, Wizz Air, 6 persone" },
-  { d:"2026-11-07", c:3180, mkd:null, p:PERSONE.indexOf("Felice"), t:TIPI.indexOf("Varie"),
-    q:TUTTI, n:"eSIM Holafly" }
+  { id:"pre-volo", d:"2026-11-07", c:58030, mkd:null, p:PERSONE.indexOf("Felice"),
+    t:TIPI.indexOf("Trasporti"), q:TUTTI, n:"Volo A/R Bari–Skopje, Wizz Air, 6 persone", m:PRIMA },
+  { id:"pre-esim", d:"2026-11-07", c:3180, mkd:null, p:PERSONE.indexOf("Felice"),
+    t:TIPI.indexOf("Varie"), q:TUTTI, n:"eSIM Holafly", m:PRIMA }
 ];
 
-// Database condiviso (Firestore via API REST, senza SDK: niente da scaricare, funziona anche
-// se la rete cade). Finché PROGETTO è vuoto l'app lavora solo in locale, come prima.
+// Database condiviso: Firebase Realtime Database via REST, senza SDK e senza chiavi.
+// Le regole aprono solo il ramo /viaggi/skopje-2026; tutto il resto risponde 401.
+// Niente libreria da scaricare, quindi se la rete cade l'app continua in locale e risincronizza dopo.
 const NUVOLA = {
-  PROGETTO: "",        // id del progetto Firebase
-  CHIAVE: "",          // apiKey del progetto (è pubblica per definizione nelle app web)
-  DOCUMENTO: "skopje-2026",
+  URL: "https://skopje-2026-default-rtdb.europe-west1.firebasedatabase.app",
+  RAMO: "viaggi/skopje-2026",
 };
-const attiva = () => !!(NUVOLA.PROGETTO && NUVOLA.CHIAVE);
+const attiva = () => !!NUVOLA.URL;
 
 let spese = [];        // {id, d, c, mkd, p, t, q, n, m}  m = quando è stata modificata
 let cancellate = {};   // {id: quando} — serve per propagare le eliminazioni agli altri telefoni
@@ -385,8 +389,7 @@ function nuoveId(){ return "s" + Date.now().toString(36) + Math.random().toStrin
 /* ------------------------------------------------- database condiviso */
 // Firestore via REST: un solo documento con dentro tutto. Niente SDK da scaricare,
 // quindi se la rete manca l'app continua a funzionare in locale e risincronizza dopo.
-const urlDoc = () => `https://firestore.googleapis.com/v1/projects/${NUVOLA.PROGETTO}`
-  + `/databases/(default)/documents/viaggi/${NUVOLA.DOCUMENTO}?key=${NUVOLA.CHIAVE}`;
+const urlDoc = () => `${NUVOLA.URL}/${NUVOLA.RAMO}.json`;
 
 function statoNuvola(stato, quando){
   statoSync = stato;
@@ -399,19 +402,15 @@ function statoNuvola(stato, quando){
 
 async function leggiNuvola(){
   const r = await fetch(urlDoc(), { cache:"no-store" });
-  if (r.status === 404) return { spese: [], cancellate: {} };     // documento non ancora creato
   if (!r.ok) throw new Error("lettura fallita: " + r.status);
-  const d = await r.json();
-  const testo = d.fields && d.fields.dati && d.fields.dati.stringValue;
-  return testo ? decomprimi(testo) : { spese: [], cancellate: {} };
+  const d = await r.json();                       // null se il ramo è ancora vuoto
+  return d && d.dati ? decomprimi(d.dati) : { spese: [], cancellate: {} };
 }
 
 async function scriviNuvola(){
-  const r = await fetch(urlDoc(), { method:"PATCH",
+  const r = await fetch(urlDoc(), { method:"PUT",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ fields: {
-      dati: { stringValue: comprimi() },
-      aggiornato: { stringValue: new Date().toISOString() } } }) });
+    body: JSON.stringify({ dati: comprimi(), aggiornato: new Date().toISOString() }) });
   if (!r.ok) throw new Error("scrittura fallita: " + r.status);
 }
 
@@ -716,7 +715,7 @@ function avvia(){
     const mio = caricaLocale();
     if (mio) caricate = fondi(mio, caricate);
   }
-  if (!caricate) caricate = { spese: PRECARICATE.map(s => ({ ...s, id:nuoveId(), m:Date.now() })), cancellate:{} };
+  if (!caricate) caricate = { spese: PRECARICATE.map(s => ({ ...s })), cancellate:{} };
   spese = caricate.spese; cancellate = caricate.cancellate || {};
   if (origine === "link"){
     salvaLocale();                                        // subito al sicuro sul dispositivo
@@ -779,7 +778,7 @@ function avvia(){
     if (!confirm("Cancellare tutte le spese da questo dispositivo?")) return;
     try { localStorage.removeItem("spese-skopje-link"); } catch(e){}
     for (const x of spese) cancellate[x.id] = Date.now();   // così sparisce anche dagli altri telefoni
-    spese = PRECARICATE.map(s => ({ ...s, id:nuoveId(), m:Date.now() }));
+    spese = PRECARICATE.map(s => ({ ...s }));
     fineModifica(); disegna(); esito("Azzerato.");
   };
 
